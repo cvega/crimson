@@ -180,7 +180,7 @@ class AttributeSet implements NamedNodeMap, XmlWritable
                 uri = source.getURI(i);
                 // Translate "" of SAX2 to null.  See DOM2 spec under Node
                 // namespaceURI
-                if (uri.equals("")) {
+                if ("".equals(uri)) {
                     uri = null;
                 }
             }

@@ -6,6 +6,9 @@
 
 package org.xml.sax.helpers;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Create a new instance of a class by name.
  *
@@ -19,12 +22,9 @@ package org.xml.sax.helpers;
  * ClassLoader if possible and falls back to using
  * Class.forName(String).</p>
  *
- * <p>This code is designed to run on JDK version 1.1 and later including
- * JVMs that perform early linking like the Microsoft JVM in IE 5.  Note
- * however that it must be compiled on a JDK version 1.2 or later system
- * since it calls Thread#getContextClassLoader().  The code also runs both
- * as part of an unbundled jar file and when bundled as part of the
- * JDK.</p>
+ * <p>This code is designed to compile and run on JDK version 1.1 and
+ * later.  The code also runs both as part of an unbundled jar file and
+ * when bundled as part of the JDK.</p>
  */
 class NewInstance {
     /**
@@ -37,21 +37,26 @@ class NewInstance {
             InstantiationException
     {
         ClassLoader classLoader;
+        Method m = null;
+
         try {
-            // Construct the name of the concrete class to instantiate
-            Class clazz = Class.forName(NewInstance.class.getName()
-                                        + "$ClassLoaderFinderConcrete");
-            ClassLoaderFinder clf = (ClassLoaderFinder) clazz.newInstance();
-            classLoader = clf.getContextClassLoader();
-        } catch (LinkageError le) {
+            m = Thread.class.getMethod("getContextClassLoader", null);
+        } catch (NoSuchMethodException e) {
             // Assume that we are running JDK 1.1, use the current ClassLoader
             classLoader = NewInstance.class.getClassLoader();
-        } catch (ClassNotFoundException x) {
-            // This case should not normally happen.  MS IE can throw this
-            // instead of a LinkageError the second time Class.forName() is
-            // called so assume that we are running JDK 1.1 and use the
-            // current ClassLoader
-            classLoader = NewInstance.class.getClassLoader();
+        }
+
+        try {
+            classLoader = (ClassLoader) m.invoke(Thread.currentThread(), null);
+        } catch (IllegalAccessException e) {
+            // assert(false)
+            throw new ClassNotFoundException(
+                "Unexpected IllegalAccessException");
+        } catch (InvocationTargetException e) {
+            // assert(e.getTargetException() instanceof SecurityException)
+            // This case should not happen
+            throw new ClassNotFoundException(
+                "Unexpected InvocationTargetException");
         }
 
         Class driverClass;
@@ -61,20 +66,5 @@ class NewInstance {
             driverClass = classLoader.loadClass(className);
         }
         return driverClass.newInstance();
-    }
-
-    /*
-     * The following nested classes allow getContextClassLoader() to be
-     * called only on JDK 1.2 and yet run in older JDK 1.1 JVMs
-     */
-
-    private static abstract class ClassLoaderFinder {
-        abstract ClassLoader getContextClassLoader();
-    }
-
-    static class ClassLoaderFinderConcrete extends ClassLoaderFinder {
-        ClassLoader getContextClassLoader() {
-            return Thread.currentThread().getContextClassLoader();
-        }
     }
 }

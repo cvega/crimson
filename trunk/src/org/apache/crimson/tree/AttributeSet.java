@@ -351,12 +351,17 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     
     /**
      * <b>DOM2:</b>
-     * XXX spec allows Element nodes also, but this code assumes Attr nodes
-     * only
+     * XXX spec technically allows Element nodes also, but this code
+     * assumes Attr nodes only
      */
     public Node setNamedItemNS(Node arg) throws DOMException {
         if (readonly) {
             throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+        }
+
+	if (!(arg instanceof AttributeNode) ||
+            arg.getOwnerDocument() != ownerElement.getOwnerDocument()) {
+	    throw new DomEx(DomEx.WRONG_DOCUMENT_ERR);
         }
 
         AttributeNode attr = (AttributeNode) arg;

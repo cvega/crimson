@@ -2706,9 +2706,20 @@ public class Parser2
             if (uri.charAt (0) != '/')
                 uri = baseURI + uri;
             else {
-                // XXX slashes at the beginning of a relative URI are
-                // a special case we don't handle.
-                throw new InternalError ();
+                // We have relative URI that begins with a '/'
+
+                // Extract scheme including colon from baseURI
+                String baseURIScheme;
+                int colonIndex = baseURI.indexOf(':');
+                if (colonIndex == -1) {
+                    // Base URI does not have a scheme so default to
+                    // "file:" scheme
+                    baseURIScheme = "file:";
+                } else {
+                    baseURIScheme = baseURI.substring(0, colonIndex + 1);
+                }
+
+                uri = baseURIScheme + uri;
             }
 
             // letting other code map any "/xxx/../" or "/./" to "/",

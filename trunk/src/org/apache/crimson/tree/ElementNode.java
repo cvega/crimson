@@ -451,9 +451,6 @@ public class ElementNode extends NamespacedNode implements ElementEx
     {
         AttributeNode.checkArguments(namespaceURI, qualifiedName);
         String prefix = XmlNames.getPrefix(qualifiedName);
-        if (prefix == null) {
-            throw new DomEx(DomEx.NAMESPACE_ERR);
-        }
 
         Attr attr = getAttributeNodeNS(namespaceURI,
                 XmlNames.getLocalPart(qualifiedName));

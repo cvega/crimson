@@ -66,7 +66,6 @@ import java.util.Vector;
 
 import org.w3c.dom.*;
 
-import org.xml.sax.AttributeList;
 import org.xml.sax.Attributes;
 
 import org.apache.crimson.parser.AttributesEx;

@@ -61,8 +61,9 @@ import org.xml.sax.helpers.*;
 import org.w3c.dom.*;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.File;
+import java.io.*;
 
 
 /**
@@ -80,8 +81,11 @@ import java.io.File;
  * @author Edwin Goei <edwingo@apache.org>
  */
 public class DOMEcho {
+    /** All output will be use this encoding */
+    static final String outputEncoding = "UTF-8";
+
     /** Output goes here */
-    private PrintStream out;
+    private PrintWriter out;
 
     /** Indent level */
     private int indent = 0;
@@ -89,7 +93,7 @@ public class DOMEcho {
     /** Indentation will be in multiples of basicIndent  */
     private final String basicIndent = "  ";
 
-    DOMEcho(PrintStream out) {
+    DOMEcho(PrintWriter out) {
         this.out = out;
     }
 
@@ -240,7 +244,7 @@ public class DOMEcho {
         System.exit(1);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String filename = null;
         boolean validation = false;
 
@@ -300,7 +304,10 @@ public class DOMEcho {
         }
 
         // Set an ErrorHandler before parsing
-        db.setErrorHandler(new MyErrorHandler(System.err));
+        OutputStreamWriter errorWriter =
+            new OutputStreamWriter(System.err, outputEncoding);
+        db.setErrorHandler(
+            new MyErrorHandler(new PrintWriter(errorWriter, true)));
 
         // Step 3: parse the input file
         Document doc = null;
@@ -315,15 +322,17 @@ public class DOMEcho {
         }
 
         // Print out the DOM tree
-        new DOMEcho(System.out).echo(doc);
+        OutputStreamWriter outWriter =
+            new OutputStreamWriter(System.out, outputEncoding);
+        new DOMEcho(new PrintWriter(outWriter, true)).echo(doc);
     }
 
     // Error handler to report errors and warnings
     private static class MyErrorHandler implements ErrorHandler {
         /** Error handler output goes here */
-        private PrintStream out;
+        private PrintWriter out;
 
-        MyErrorHandler(PrintStream out) {
+        MyErrorHandler(PrintWriter out) {
             this.out = out;
         }
 

@@ -100,6 +100,10 @@ public class XmlDocumentBuilder2 extends XmlDocumentBuilder
 	//
         ElementNode2 e = null;
 	try {
+            // Translate a SAX empty string to mean no namespaceURI
+            if ("".equals(namespaceURI)) {
+                namespaceURI = null;
+            }
             e = (ElementNode2)document.createElementNS(namespaceURI, qName);
 	} catch (DOMException ex) {
 	    throw new SAXParseException(getMessage("XDB-004",

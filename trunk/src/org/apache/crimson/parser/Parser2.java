@@ -684,7 +684,7 @@ public class Parser2
         // and do not expand when processing AttValue.  Save state of
         // doLexicalPE and restore it before returning.
         boolean savedLexicalPE = doLexicalPE;
-        doLexicalPE = isEntityValue;
+//         doLexicalPE = isEntityValue;
 
         char            quote = getc ();
         char            c;
@@ -783,7 +783,7 @@ public class Parser2
         }
 
         isInAttribute = false;
-        doLexicalPE = savedLexicalPE;
+//         doLexicalPE = savedLexicalPE;
     }
 
     // does a SINGLE expansion of the entity (often reparsed later)
@@ -1391,7 +1391,14 @@ public class Parser2
             nextChar ('=', "F-026", attQName);
             in.maybeWhitespace ();
 
+            // We are not in the DTD => PEs are not recognized => we no
+            // longer need to expand PEs => don't expand PEs in AttValue =>
+            // doLexicalPE = false and call parseLiteral(isEntityValue =
+            // false) both
+            doLexicalPE = false;
             parseLiteral (false);
+            // We are no longer in the DTD so we never need to expand PEs
+
             sawWhite = in.maybeWhitespace ();
 
             // normalize and check values right away.
@@ -2194,7 +2201,15 @@ public class Parser2
                 a.valueDefault = AttributeDecl.FIXED;
                 a.isFixed = true;
                 whitespace ("F-004");
-                parseLiteral (false);
+
+                // Don't expand PEs in AttValue => doLexicalPE = false and
+                // call parseLiteral(isEntityValue = false) both
+                doLexicalPE = false;
+                parseLiteral(false);
+
+                // We are in DTD so set this back to true
+                doLexicalPE = true;
+
                 if (a.type != AttributeDecl.CDATA)
                     a.defaultValue = normalize (false);
                 else
@@ -2208,7 +2223,15 @@ public class Parser2
                         && a.type == AttributeDecl.ID)
                     error ("V-018", new Object [] { a.name });
                 // By default a.valueDefault == null here
-                parseLiteral (false);
+
+                // Don't expand PEs in AttValue => doLexicalPE = false and
+                // call parseLiteral(isEntityValue = false) both
+                doLexicalPE = false;
+                parseLiteral(false);
+
+                // We are in DTD so set this back to true
+                doLexicalPE = true;
+
                 if (a.type != AttributeDecl.CDATA)
                     a.defaultValue = normalize (false);
                 else

@@ -546,7 +546,8 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
         
 	try {
 	    NodeBase lastChild = (NodeBase) top.getLastChild ();
-	    if (lastChild instanceof TextNode) {
+	    if (lastChild != null && lastChild.getClass() == TextNode.class) {
+                // Merge only TextNode data and not CDataNode data
 		String tmp  = new String (buf, offset, len);
 	   	((TextNode)lastChild).appendData (tmp);
 	    } else {

@@ -115,8 +115,6 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         throws DomEx
     {
         super(namespaceURI, qName);
-        // Check arguments and throw appropriate exceptions
-        checkArguments(namespaceURI, qName);
     }
 
     // Used for cloneNode()
@@ -131,7 +129,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         ownerDocument = original.ownerDocument;
     }
 
-    private void checkArguments(String namespaceURI, String qualifiedName)
+    static void checkArguments(String namespaceURI, String qualifiedName)
         throws DomEx
     {
         // [6] QName ::= (Prefix ':')? LocalPart

@@ -840,6 +840,8 @@ public class XmlDocument extends ParentNode implements DocumentEx
     public Element createElementNS(String namespaceURI, String qualifiedName)
         throws DOMException
     {
+        // Check arguments and throw appropriate exceptions
+        ElementNode2.checkArguments(namespaceURI, qualifiedName);
         ElementNode2 retval = new ElementNode2(namespaceURI, qualifiedName);
         retval.setOwnerDocument(this);
         return retval;

@@ -109,7 +109,11 @@ class AttributeNode extends NamespacedNode implements Attr
     private String value;
     private boolean specified;
     private String defaultValue;
+
+    /** At construction time ownerElement is null, it gets set whenever an
+        attribute is set on an ElementNode */
     private Element ownerElement;
+
     private static final String
         SPEC_XML_URI = "http://www.w3.org/XML/1998/namespace";
     private static final String
@@ -291,7 +295,9 @@ class AttributeNode extends NamespacedNode implements Attr
         }
     }
 
-    /** DOM: returns a copy of this node */
+    /**
+     * DOM: returns a copy of this node which is not owned by an Element
+     */
     public Node cloneNode(boolean deep) {
         AttributeNode attr = cloneAttributeNode(deep);
         // DOM says specified should be true
@@ -307,7 +313,6 @@ class AttributeNode extends NamespacedNode implements Attr
         try {
             AttributeNode attr =
                 new AttributeNode(name, value, specified, defaultValue);
-            attr.ownerElement = ownerElement;
             attr.setOwnerDocument((XmlDocument)getOwnerDocument());
             if (deep) {
                 Node node;

@@ -75,7 +75,7 @@ import org.apache.crimson.parser.AttributesEx;
  * Class representing a list of XML attributes.
  *
  * <P> This couples slightly with the Sun XML parser, in that it optionally
- * uses an extended SAX 1.0 API to see if an attribute was specified in the
+ * uses an extended SAX API to see if an attribute was specified in the
  * document or was instead defaulted by attribute processing.
  *
  * @author David Brownell
@@ -97,7 +97,8 @@ class AttributeSet implements NamedNodeMap, XmlWritable
 
     /*
      * Constructs a copy of an attribute list, for use in cloning.
-     * ownerElement is set separately.
+     * AttributeNode.ownerElement is set later when the attributes are
+     * associated with an Element.
      */
     // package private
     AttributeSet (AttributeSet original, boolean deep)
@@ -114,10 +115,6 @@ class AttributeSet implements NamedNodeMap, XmlWritable
 
             AttributeNode attr = (AttributeNode)node;
             node = attr.cloneAttributeNode(deep);
-
-            // temporarily undo binding to element ... it's rebound
-            // by the caller
-            attr.setOwnerElement(null);
             list.addElement (node);
         }
     }

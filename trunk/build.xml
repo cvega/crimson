@@ -80,7 +80,8 @@ downloads a source distribution and unpacks it, then case #2 should be used.
       <format pattern="yyyy-MM-dd" property="TODAY-ISO"/>
     </tstamp>
     <filter token="today-iso" value="${TODAY-ISO}"/>
-    <filter token="version" value="${impl.version}"/>
+    <filter token="impl-version" value="${impl.version}"/>
+    <filter token="jaxp-spec-version" value="${jaxp.spec.version}"/>
   </target>
 
   <target name="prepare" depends="init">
@@ -156,17 +157,6 @@ downloads a source distribution and unpacks it, then case #2 should be used.
     </copy>
   </target>
 
-  <!-- This target was used to create a separate JAXP API jar which
-        contained only the javax.xml.parsers and javax.xml.transform.*
-        packages.  No longer used. -->
-  <target name="api-jar" depends="compile-api">
-    <jar jarfile="${build.dir}/${api.jar.name}"
-         basedir="${build.classes}"
-         manifest="src/META-INF/jaxp-javax.manifest" >
-      <include name="javax/xml/**"/>
-    </jar>
-  </target>
-
   <target name="crimson.jar" depends="compile-api,compile-impl">
     <mkdir dir="${build.classes}/META-INF/services" />
     <copy todir="${build.classes}/META-INF/services">
@@ -175,9 +165,11 @@ downloads a source distribution and unpacks it, then case #2 should be used.
         <include name="javax.xml.parsers.DocumentBuilderFactory" />
       </fileset>
     </copy>
+    <copy todir="${build.classes}/META-INF"
+          file="src/META-INF/manifest.crimson" filtering="true"/>
     <jar jarfile="${build.dir}/crimson.jar"
          basedir="${build.classes}"
-         manifest="src/META-INF/manifest.crimson" >
+         manifest="${build.classes}/META-INF/manifest.crimson">
       <include name="META-INF/services/**" />
       <include name="org/apache/crimson/**" />
       <patternset refid="api-patternset"/>

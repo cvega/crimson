@@ -1408,11 +1408,11 @@ public class Parser2
 
             if (namespaces) {
                 processAttributeNS(attQName, type, value, defaultValue,
-                                   false, false);
+                                   true, false);
             } else {
                 // No namespaces case
                 attTmp.addAttribute("", "", attQName, type, value,
-                                    defaultValue, false);
+                                    defaultValue, true);
             }
 
             haveAttributes = true;

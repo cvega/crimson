@@ -1005,8 +1005,12 @@ public class Parser2
     {
         // [23] XMLDecl ::= '<?xml' VersionInfo EncodingDecl?
         //                      SDDecl? S? '>'
-        if (!peek ("<?xml"))
+
+        if (!in.isXmlDeclOrTextDeclPrefix()) {
             return;
+        }
+        // Consume '<?xml'
+        peek("<?xml");
 
         readVersion (true, "1.0");
         readEncoding (false);
@@ -2735,13 +2739,18 @@ public class Parser2
     throws IOException, SAXException
     {
         // [77] TextDecl ::= '<?xml' VersionInfo? EncodingDecl S? '?>'
-        if (peek ("<?xml")) {
-            readVersion (false, "1.0");
-            readEncoding (true);
-            maybeWhitespace ();
-            if (!peek ("?>"))
-                fatal ("P-057");
+
+        if (!in.isXmlDeclOrTextDeclPrefix()) {
+            return;
         }
+        // Consume '<?xml'
+        peek("<?xml");
+
+        readVersion (false, "1.0");
+        readEncoding (true);
+        maybeWhitespace ();
+        if (!peek ("?>"))
+            fatal ("P-057");
     }
 
     // returns true except in case of nonvalidating parser which

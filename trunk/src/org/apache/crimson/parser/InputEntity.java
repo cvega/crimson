@@ -881,6 +881,65 @@ final class InputEntity implements Locator
 	return true;
     }
 
+    /**
+     * This method is used to disambiguate between XMLDecl, TextDecl, and
+     * PI by doing a lookahead w/o consuming any characters.  We look for
+     * "<?xml" plus a whitespace character, but no more.  For example, we
+     * could have input documents with the PI "<?xml-stylesheet ... >".
+     *
+     * @return true iff next chars match either the prefix for XMLDecl or
+     *              TextDecl
+     */
+    boolean isXmlDeclOrTextDeclPrefix()
+        throws IOException, SAXException
+    {
+        // [23] XMLDecl ::= '<?xml' VersionInfo EncodingDecl?
+        //                      SDDecl? S? '>'
+        // [77] TextDecl ::= '<?xml' VersionInfo? EncodingDecl S? '?>'
+        // [24] VersionInfo ::= S 'version' Eq \'|\" versionNum \'|\"
+
+        String match = "<?xml";
+        int matchLen = match.length();
+
+        // Length of the entire prefix including whitespace
+        int prefixLen = matchLen + 1;
+
+	// buffer should hold the whole thing ... give it a
+	// chance for the end-of-buffer case and cope with EOF
+	// by letting fillbuf compact and fill
+	if (finish <= start || (finish - start) < prefixLen)
+	    fillbuf ();
+
+	// can't peek past EOF
+	if (finish <= start)
+	    return false;
+
+	// Compare the non-whitespace part of the prefix
+        int i;
+        for (i = 0; i < matchLen && (start + i) < finish; i++) {
+            if (buf [start + i] != match.charAt (i))
+                return false;
+        }
+
+	// if the first fillbuf didn't get enough data, give
+	// fillbuf another chance to read
+	if (i < matchLen) {
+	    if (reader == null || isClosed)
+		return false;
+	    
+	    fillbuf ();
+	    return isXmlDeclOrTextDeclPrefix();
+	}
+
+        // assert(i == matchLen);
+        // Match whitespace
+        if (!XmlChars.isSpace(buf[i])) {
+            return false;
+        }
+
+	return true;
+    }
+
 
     //
     // Support for reporting the internal DTD subset, so <!DOCTYPE...>

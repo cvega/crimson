@@ -7,7 +7,7 @@
           default CDATA #REQUIRED
           basedir CDATA #IMPLIED>
 
-<!ELEMENT target (unjar | javadoc | tstamp | mkdir | genkey | mail | copyfile | taskdef | deltree | fail | javadoc2 | antcall | signjar | move | patch | war | zip | javac | compileTask | rename | replace | unwar | copydir | exec | unzip | available | ant | filter | sql | delete | chmod | tar | gzip | fixcrlf | gunzip | java | property | uptodate | cvs | style | untar | antstructure | rmic | touch | jar | get | echo | execon | apply | copy)*>
+<!ELEMENT target (unjar | javadoc | tstamp | mkdir | genkey | mail | copyfile | taskdef | deltree | fail | javadoc2 | antcall | signjar | move | patch | war | zip | javac | compileTask | rename | replace | unwar | copydir | exec | unzip | available | ant | filter | sql | delete | chmod | tar | gzip | gunzip | fixcrlf | java | cvs | uptodate | property | style | antstructure | untar | jar | touch | rmic | echo | get | execon | apply | copy)*>
 
 <!ATTLIST target
           id          ID    #IMPLIED
@@ -827,6 +827,14 @@
           description CDATA #IMPLIED
           src CDATA #IMPLIED>
 
+<!ELEMENT gunzip EMPTY>
+<!ATTLIST gunzip
+          id ID #IMPLIED
+          dest CDATA #IMPLIED
+          taskname CDATA #IMPLIED
+          description CDATA #IMPLIED
+          src CDATA #IMPLIED>
+
 <!ELEMENT fixcrlf (include | patternset | exclude)*>
 <!ATTLIST fixcrlf
           id ID #IMPLIED
@@ -843,14 +851,6 @@
           includesfile CDATA #IMPLIED
           excludesfile CDATA #IMPLIED
           includes CDATA #IMPLIED>
-
-<!ELEMENT gunzip EMPTY>
-<!ATTLIST gunzip
-          id ID #IMPLIED
-          dest CDATA #IMPLIED
-          taskname CDATA #IMPLIED
-          description CDATA #IMPLIED
-          src CDATA #IMPLIED>
 
 <!ELEMENT java (arg | jvmarg | classpath | sysproperty)*>
 <!ATTLIST java
@@ -885,6 +885,22 @@
           value CDATA #IMPLIED
           path CDATA #IMPLIED>
 
+<!ELEMENT cvs EMPTY>
+<!ATTLIST cvs
+          id ID #IMPLIED
+          output CDATA #IMPLIED
+          date CDATA #IMPLIED
+          quiet %boolean; #IMPLIED
+          command CDATA #IMPLIED
+          noexec %boolean; #IMPLIED
+          cvsroot CDATA #IMPLIED
+          error CDATA #IMPLIED
+          taskname CDATA #IMPLIED
+          dest CDATA #IMPLIED
+          package CDATA #IMPLIED
+          description CDATA #IMPLIED
+          tag CDATA #IMPLIED>
+
 <!ELEMENT uptodate (srcfiles | include | patternset | exclude | mapper)*>
 <!ATTLIST uptodate
           id ID #IMPLIED
@@ -910,22 +926,6 @@
           includesfile CDATA #IMPLIED
           excludes CDATA #IMPLIED>
 
-<!ELEMENT cvs EMPTY>
-<!ATTLIST cvs
-          id ID #IMPLIED
-          output CDATA #IMPLIED
-          date CDATA #IMPLIED
-          quiet %boolean; #IMPLIED
-          command CDATA #IMPLIED
-          noexec %boolean; #IMPLIED
-          cvsroot CDATA #IMPLIED
-          error CDATA #IMPLIED
-          taskname CDATA #IMPLIED
-          dest CDATA #IMPLIED
-          package CDATA #IMPLIED
-          description CDATA #IMPLIED
-          tag CDATA #IMPLIED>
-
 <!ELEMENT style (include | patternset | exclude | param)*>
 <!ATTLIST style
           id ID #IMPLIED
@@ -944,6 +944,13 @@
           excludesfile CDATA #IMPLIED
           includes CDATA #IMPLIED>
 
+<!ELEMENT antstructure EMPTY>
+<!ATTLIST antstructure
+          id ID #IMPLIED
+          output CDATA #IMPLIED
+          taskname CDATA #IMPLIED
+          description CDATA #IMPLIED>
+
 <!ELEMENT untar EMPTY>
 <!ATTLIST untar
           id ID #IMPLIED
@@ -952,12 +959,31 @@
           description CDATA #IMPLIED
           src CDATA #IMPLIED>
 
-<!ELEMENT antstructure EMPTY>
-<!ATTLIST antstructure
+<!ELEMENT jar (include | fileset | patternset | exclude | zipfileset)*>
+<!ATTLIST jar
           id ID #IMPLIED
-          output CDATA #IMPLIED
+          manifest CDATA #IMPLIED
+          compress %boolean; #IMPLIED
+          defaultexcludes %boolean; #IMPLIED
+          jarfile CDATA #IMPLIED
+          basedir CDATA #IMPLIED
           taskname CDATA #IMPLIED
-          description CDATA #IMPLIED>
+          zipfile CDATA #IMPLIED
+          whenempty CDATA #IMPLIED
+          description CDATA #IMPLIED
+          excludes CDATA #IMPLIED
+          includesfile CDATA #IMPLIED
+          excludesfile CDATA #IMPLIED
+          includes CDATA #IMPLIED>
+
+<!ELEMENT touch EMPTY>
+<!ATTLIST touch
+          id ID #IMPLIED
+          taskname CDATA #IMPLIED
+          millis CDATA #IMPLIED
+          file CDATA #IMPLIED
+          description CDATA #IMPLIED
+          datetime CDATA #IMPLIED>
 
 <!ELEMENT rmic (include | classpath | patternset | exclude)*>
 <!ATTLIST rmic
@@ -983,31 +1009,15 @@
           excludesfile CDATA #IMPLIED
           stubversion CDATA #IMPLIED>
 
-<!ELEMENT touch EMPTY>
-<!ATTLIST touch
+<!ELEMENT echo (#PCDATA)>
+<!ATTLIST echo
           id ID #IMPLIED
+          append %boolean; #IMPLIED
           taskname CDATA #IMPLIED
-          millis CDATA #IMPLIED
           file CDATA #IMPLIED
+          message CDATA #IMPLIED
           description CDATA #IMPLIED
-          datetime CDATA #IMPLIED>
-
-<!ELEMENT jar (include | fileset | patternset | exclude | zipfileset)*>
-<!ATTLIST jar
-          id ID #IMPLIED
-          manifest CDATA #IMPLIED
-          compress %boolean; #IMPLIED
-          defaultexcludes %boolean; #IMPLIED
-          jarfile CDATA #IMPLIED
-          basedir CDATA #IMPLIED
-          taskname CDATA #IMPLIED
-          zipfile CDATA #IMPLIED
-          whenempty CDATA #IMPLIED
-          description CDATA #IMPLIED
-          excludes CDATA #IMPLIED
-          includesfile CDATA #IMPLIED
-          excludesfile CDATA #IMPLIED
-          includes CDATA #IMPLIED>
+          level (error | warning | info | verbose | debug) #IMPLIED>
 
 <!ELEMENT get EMPTY>
 <!ATTLIST get
@@ -1019,16 +1029,6 @@
           usetimestamp %boolean; #IMPLIED
           ignoreerrors %boolean; #IMPLIED
           src CDATA #IMPLIED>
-
-<!ELEMENT echo (#PCDATA)>
-<!ATTLIST echo
-          id ID #IMPLIED
-          append %boolean; #IMPLIED
-          taskname CDATA #IMPLIED
-          file CDATA #IMPLIED
-          message CDATA #IMPLIED
-          description CDATA #IMPLIED
-          level (error | warning | info | verbose | debug) #IMPLIED>
 
 <!ELEMENT execon (arg | fileset | env | srcfile)*>
 <!ATTLIST execon

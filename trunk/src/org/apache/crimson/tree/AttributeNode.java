@@ -117,11 +117,17 @@ public class AttributeNode extends NamespacedNode implements Attr
                          String value, boolean specified, String defaultValue)
         throws DOMException
     {
-        this.qName = qName;
-        this.namespaceURI = namespaceURI;
+        super(namespaceURI, qName);
         this.value = value;
         this.specified = specified;
         this.defaultValue = defaultValue;
+    }
+
+    // Used for cloneNode()
+    private AttributeNode(AttributeNode original) {
+        this(original.namespaceURI, original.qName,
+             original.value, original.specified, original.defaultValue);
+        ownerDocument = original.ownerDocument;
     }
 
     /**
@@ -289,11 +295,7 @@ public class AttributeNode extends NamespacedNode implements Attr
      */
     AttributeNode cloneAttributeNode(boolean deep) {
         try {
-            // XXX should probably use Java Cloneable scheme instead
-            AttributeNode attr =
-                new AttributeNode(namespaceURI, qName, value, specified,
-                                  defaultValue);
-            attr.setOwnerDocument((XmlDocument)getOwnerDocument());
+            AttributeNode attr = new AttributeNode(this);
             if (deep) {
                 Node node;
                 for (int i = 0; (node = item (i)) != null; i++) {

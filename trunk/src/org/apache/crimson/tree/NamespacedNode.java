@@ -78,6 +78,11 @@ abstract class NamespacedNode extends ParentNode {
 
     protected String namespaceURI;
 
+    NamespacedNode(String namespaceURI, String qName) {
+        this.namespaceURI = namespaceURI;
+        this.qName = qName;
+    }
+
     /**
      * The namespace URI of this node, or <code>null</code> if it is
      * unspecified.  This is not a computed value.

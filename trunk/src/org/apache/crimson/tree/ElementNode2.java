@@ -114,11 +114,21 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
     public ElementNode2(String namespaceURI, String qName)
         throws DomEx
     {
+        super(namespaceURI, qName);
         // Check arguments and throw appropriate exceptions
         checkArguments(namespaceURI, qName);
+    }
 
-        this.qName = qName;
-        this.namespaceURI = namespaceURI;
+    // Used for cloneNode()
+    private ElementNode2(ElementNode2 original) {
+        super(original.namespaceURI, original.qName);
+        if (original.attributes != null) {
+            attributes = new AttributeSet(original.attributes, true);
+            attributes.setOwnerElement(this);
+        }
+        idAttributeName = original.idAttributeName;
+        userObject = original.userObject;
+        ownerDocument = original.ownerDocument;
     }
 
     private void checkArguments(String namespaceURI, String qualifiedName)
@@ -531,9 +541,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
 	try {
 	    ElementNode2 retval;
 
-	    retval = (ElementNode2)getOwnerDocument().createElement(qName);
-	    if (attributes != null)
-		retval.setAttributes (new AttributeSet (attributes, true));
+            retval = new ElementNode2(this);
 	    if (deep) {
 		for (int i = 0; true; i++) {
 		    Node	node = item (i);

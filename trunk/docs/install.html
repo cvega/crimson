@@ -1,9 +1,10 @@
-<HTML><HEAD>
+<html>
+  <head>
     <!-- $Id$ -->
-    <TITLE>
+    <title>
         Java API for XML Processing -- Installation
-    </TITLE>
-    <STYLE>
+    </title>
+    <style>
     <!--
         BODY {
             font-family:        Lucida, Helvetica, Univers, sans-serif;
@@ -16,172 +17,65 @@
             font-family:        Courier, monospace;
         }
     -->
-    </STYLE>
-</HEAD><BODY BGCOLOR="#eeeeff">
+    </style>
+  </head>
+  <body bgcolor="#eeeeff">
 
+    <h1>Java<sup><font size="-2">TM</font></sup> API for XML Processing<br>
+      Installation
+    </h1>
+    <center>
+      <b>Version:</b> 1.1ea2 (Early Access 2)<br>
+    </center>
 
-<H1>
-Java API for XML Processing
-<br>
-Installation
-</H1>
-<center>
-<b>Version:</b> 1.1ea (Early Access)<br>
-</center>
+    <h2>System Requirements</h2>
 
-<H2> System Requirements </H2>
+    This version of the Java API for XML Processing requires:
+    <ul>
+      <li>JDK 1.1.8 or later (including any version of Java 2)</li>
+      <li>At least 8MB of free disk space</li>
+    </ul>
 
-This version of the Java API for XML Processing requires:
-<UL>
-    <li>JDK 1.1.8 or later (including any version of Java 2)</li>
-    <li>At least 8MB of free disk space</li>
-</UL>
+    <h2>Installation</h2>
 
-<!--
-<p>In addition, the PATH and JAVA_HOME environment variables must reference the JDK or Java 2 SDK. If you have not already done this, use the following instructions:
+    <ol>
+      <li>Download the zip file.</li>
+      <li>Unzip and install the file.
+	<p>You may use the <code>jar</code> command from the JDK or Java 2
+	SDK to unzip the distribution or use another platform specific
+	utility to do this.  Unzipping the file creates a directory of the
+	form <code>jaxp-&lt;version&gt;</code> within the extraction directory.
+	</p>
+      </li>
+      
+    <li>Update the java classpath.
+	<p>You can either update the <code>CLASSPATH</code> environment
+	  variable to include the three jar files, or you can install the
+	  jar files as an extension to Java 2.
+	</p>
 
-<P>On Solaris, if you've installed the JDK in <em>/java</em>:
-<code>
-<PRE>
-    % set PATH=(/java/bin $PATH)
-    % setenv JAVA_HOME /java
-</PRE>
-</code>
+	<p>To update the <code>CLASSPATH</code> variable, add the following
+	  components.  Let <code>$XML</code> represent the directory where
+	  you installed JAXP.
+	</p>
+	<ul>
+	  <li>On Unix:<br />
+	    <code>$XML/jaxp.jar:$XML/crimson.jar:$XML/xalan.jar</code></li>
+	  <li>On Win32:<br />
+	    <code>$XML\jaxp.jar;$XML\crimson.jar;$XML\xalan.jar</code></li>
+	</ul>
+    <p>To install these jar files as an extension of Java 2, copy them to
+      the <code>$JAVA_HOME/jre/lib/ext</code> directory.  (The
+      <code>JAVA_HOME</code> directory is the one that contains
+      <code>bin/java</code>.)  This eliminates the need to modify class
+      paths.  (This technique may also be used with the Java Plug-in.)</p>
+      </li>
 
-    On Win32 systems, if you have installed the JDK or Java 2 SDK in
-    <em>D:\java</em>:<code><PRE>
-    C:\> set PATH=D:\java\bin;%PATH%
-    C:\> set JAVA_HOME=D:\java
-    </PRE></code>
--->
+    <li>Run the sample programs.  Please refer to <a
+	href="examples/index.html">information on examples</a>.
+    </li>
 
-<H2> Installation </H2>
-
-<OL>
-    
-    <li>Download the ZIP/Install file.</li>
-<!--
-
-<p> Log on to the Java Developer Connection site and select the download
-file for the platform you are using (Windows or Unix).</p>
-
-<p>On Unix, download or copy the file to the location where you want to
-install the software.</p>
-
-    <P>
--->
-    <li> UnZip/Install the file.</li>
-<!--
-<p>
-<em>On Unix systems</em>, uncompress the downloaded <em>jaxp-1_0_1.zip</em> 
-ZIP file.
-
-<p>    You may use the JAR command from the JDK or Java 2 SDK to unzip the
-    distribution:  <blockquote>
-    <code>jar xvf jaxp-1_0_1.zip</code></blockquote>
-
-<p>
-    Alternatively, you may use an <em>UnZip</em> utility.  <a href=http://www.cdrom.com/pub/infozip/>Info-ZIP</a>
-    is one such utility, available on a variety of
-    operating systems.
-
-<p>Unzipping the file creates a directory called jaxp1.0.1 within the current directory.
-
-<p>
-<em>On Windows systems</em>, simply run the downloaded <em>jaxp-1_0_1-win.exe</em>
-file.
-By default, this program uses the following directory: <br>
-c:\Program Files\javasoft\jaxp1.0.1
-<p> You may change the destination directory at setup time.
-    <P>
--->
-<!--
-    <LI> <em>Check the contents of the distribution.</em>
-    
-<p>
-After the software is unzipped or installed, the new directory should contain the following files:
-
-    <P><CENTER><TABLE BORDER=1 BGCOLOR="#ffffcc">
-
-    <TR><TD><b>LICENSE</b></TD>
-        <TD> The license applying to this software </TD></TR>
-
-    <TR><TD><b>docs/api/* </b></TD>
-        <TD> Javadoc generated files presenting library APIs </TD></TR>
-
-    <TR><TD><b>examples/* </b></TD>
-        <TD> Example files, in subdirectories </TD></TR>
-
-    <TR><TD><b>examples/index.html </b></TD>
-        <TD> Index to the example files </TD></TR>
-
-    <TR><TD><b>readme.html</b></TD>
-        <TD> README for this release </TD></TR>
-
-    <TR><TD><b>install.html</b></TD>
-        <TD> This file </TD></TR>
-
-    <TR><TD><b>relnotes.html</b></TD>
-        <TD> Release notes </TD></TR>
-
-    <TR><TD><b>jaxp.jar</b></TD>
-        <TD> Java Archive file containing the javax classes </TD></TR>
-
-    <TR><TD><b>parser.jar</b></TD>
-        <TD> Java Archive file containing the implementation classes </TD></TR>
-
-    </TABLE></CENTER>
-
-    <P>
-
--->
-    <li>Update the CLASSPATH.</li>
-
-<P> You can either update the CLASSPATH variable to include the three jar
-files, or you can install the JAR files as an extension to Java 2.</p>
-
-<p>To update the CLASSPATH variable, add the following entry to the
-variable (where <code>$XML</code> is the base directory in which the XML
-library is installed):</p>
-<p>
-<ul>
-      <li> Unix:
-	<code>$XML/jaxp.jar:$XML/crimson.jar:$XML/xalan.jar
-	</code></li>
-      <li> Win32:
-	<code>$XML\jaxp.jar;$XML\crimson.jar;$XML\xalan.jar
-	</code></li>
-</ul>
-</p>
-    <p> To install these JAR files as an extension of Java 2, copy them to
-    the <code>$JAVA_HOME/jre/lib/ext</code> directory.  (The
-    <code>JAVA_HOME</code> directory is the one that contains
-    <code>bin/java</code>.)  This eliminates the need to modify class
-    paths.  (This technique may also be used with the Java Plug-in.)</p>
-
-<!--
-    <LI> <em>Run the sample programs.</em>
-
-<p>
-    To run the sample programs, first compile them, then
-    run them following the invocation instructions in the Makefile (for Solaris) or batch file (for Win32). 
-
-<P>The Makefiles and batch files should work with minimal changes, if any. The files will build the classes as necessary, assuming that the JDK is set up correctly.   
-For example:<PRE>
-    % cd $XML/examples/simple
-    % make
-    <em>... output</em>
-    %
-    </PRE>
-     <br>
-     or in Windows: <PRE>
-     C:\Program Files\javasoft\jaxp1.0.1&gt cd examples\simple
-     C:\Program Files\javasoft\jaxp1.0.1\examples\simple&gt build
-     <em>... output</em>
-     C:\Program Files\javasoft\jaxp1.0.1\examples\simple>
-     </PRE>
--->
-</OL>
+</ol>
 
 <!--
     <p> Note that due to code generation problems in the 1.1 "javac" and

@@ -278,6 +278,11 @@ public class DOMEcho {
         DocumentBuilderFactory dbf =
             DocumentBuilderFactory.newInstance();
 
+        // Set namespaceAware to true to get a DOM Level 2 tree with nodes
+        // containing namesapce information.  This is necessary because the
+        // default value from JAXP 1.0 was defined to be false.
+        dbf.setNamespaceAware(true);
+
         // Optional: set various configuration options
         dbf.setValidating(validation);
         dbf.setIgnoringComments(ignoreComments);

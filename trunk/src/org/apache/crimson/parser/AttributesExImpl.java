@@ -60,171 +60,87 @@ package org.apache.crimson.parser;
 
 import java.util.Vector;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.helpers.AttributesImpl;
 
 
 /**
- * Implementation of the SAX AttributeList interface which
- * provides additional features to support editor-oriented DOM
- * features:  exposing attribute defaulting.
- *
- * @author David Brownell
- * @version $Revision$
+ * Implementation of the AttributesEx interface which provides additional
+ * features to support editor-oriented DOM features: exposing attribute
+ * defaulting.  Derived from old AttributeListImpl.java code.
  */
 final
-class AttributeListImpl implements AttributeListEx
+class AttributesExImpl extends AttributesImpl implements AttributesEx
 {
-    // Needed to support basic Attributelist functionality 
-    private Vector	names = new Vector();
-    private Vector	types = new Vector();
-    private Vector	values = new Vector();
-
     // Boolean.TRUE indicates value was specified
-    private Vector	specified = new Vector ();
+    private Vector      specified = new Vector ();
 
     // non-null value defines default
-    private Vector	defaults = new Vector ();
+    private Vector      defaults = new Vector ();
 
     // ID attribute name, as declared
-    private String	idAttributeName;
+    private String      idAttributeName;
 
-    AttributeListImpl ()
+    AttributesExImpl()
     {
+        super();
     }
 
     /**
      * Clears the attribute list so it has no members
      */
-    public void clear ()
+    public void clear()
     {
-	names.removeAllElements ();
-	types.removeAllElements ();
-	values.removeAllElements ();
-	specified.removeAllElements ();
-	defaults.removeAllElements ();
+        super.clear();
+        specified.removeAllElements();
+        defaults.removeAllElements();
+        idAttributeName = null;
     }
-
 
     /**
-     * Add an attribute to an attribute list.
+     * Add an attribute to this list
      */
-    public void addAttribute (
-	String	name,
-	String	type,
-	String	value,
-	String	defaultValue,
-	boolean	isSpecified
-    ) {
-	names.addElement (name);
-	types.addElement (type);
-	values.addElement (value);
-	defaults.addElement (defaultValue);
-	specified.addElement (isSpecified ? Boolean.TRUE : null);
-    }
-
-
-    /**
-     * Return the number of attributes in this list.
-     */
-    public int getLength ()
+    public void addAttribute(String uri, String localName, String qName,
+                             String type, String value, String defaultValue,
+                             boolean isSpecified)
     {
-	return names.size ();
+        super.addAttribute(uri, localName, qName, type, value);
+        defaults.addElement(defaultValue);
+        specified.addElement(isSpecified ? Boolean.TRUE : null);
     }
-
-
-    /**
-     * Return the name of an attribute in this list (by position).
-     */
-    public String getName (int i)
-    {
-	try {
-	    if (i < 0)
-		return null;
-	    return (String) names.elementAt (i);
-	} catch (IndexOutOfBoundsException e) {
-	    return null;
-	}
-    }
-
 
     /**
      * Returns true if the value was specified by a parsed document
      * (by position; no by-name variant).
      */
-    public boolean isSpecified (int i)
-    {
-	Object	value = specified.elementAt (i);
-	return value == Boolean.TRUE;
+    public boolean isSpecified(int i) {
+        Object value = specified.elementAt(i);
+        return value == Boolean.TRUE;
     }
-
 
     /**
      * Return the default value of an attribute in this list (by position).
      */
-    public String getDefault (int i)
-    {
-	try {
-	    if (i < 0)
-		return null;
-	    return (String) defaults.elementAt (i);
-	} catch (IndexOutOfBoundsException e) {
-	    return null;
-	}
+    public String getDefault(int i) {
+        try {
+            if (i < 0)
+                return null;
+            return (String) defaults.elementAt(i);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
-
 
     /**
-     * Return the type of an attribute in this list (by position).
+     * Returns the name of the ID attribute.
      */
-    public String getType (int i)
-    {
-	try {
-	    if (i < 0)
-		return null;
-	    return (String) types.elementAt (i);
-	} catch (IndexOutOfBoundsException e) {
-	    return null;
-	}
+    public String getIdAttributeName() {
+        return idAttributeName;
     }
-
 
     /**
-     * Return the type of an attribute in this list (by name).
+     * Allows parser to set the name of the ID attribute.
      */
-    public String getType (String name)
-    {
-	return getType (names.indexOf (name));
+    void setIdAttributeName(String name) {
+        idAttributeName = name;
     }
-
-
-    /**
-     * Return the value of an attribute in this list (by position).
-     */
-    public String getValue (int i)
-    {
-	try {
-	    if (i < 0)
-		return null;
-	    return (String) values.elementAt (i);
-	} catch (IndexOutOfBoundsException e) {
-	    return null;
-	}
-    }
-
-
-    /**
-     * Return the value of an attribute in this list (by name).
-     */
-    public String getValue (String name)
-    {
-	return getValue (names.indexOf (name));
-    }
-
-    /** Returns the name of the ID attribute. */
-    public String getIdAttributeName ()
-	{ return idAttributeName; }
-
-    /** Returns the name of the ID attribute. */
-    void setIdAttributeName (String name)
-	{ idAttributeName  = name; }
 }

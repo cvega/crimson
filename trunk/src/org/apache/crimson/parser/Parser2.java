@@ -126,7 +126,7 @@ public class Parser2
     private InputEntity         in;
 
     // temporaries reused during parsing
-    private AttributesImpl      attTmp;
+    private AttributesExImpl    attTmp;
     private StringBuffer        strTmp;
     private char                nameTmp [];
     private NameCache           nameCache;
@@ -370,7 +370,7 @@ public class Parser2
         in = null;
 
         // alloc temporary data used in parsing
-        attTmp = new AttributesImpl ();
+        attTmp = new AttributesExImpl ();
         strTmp = new StringBuffer ();
         nameTmp = new char [20];
         nameCache = new NameCache ();
@@ -1404,19 +1404,21 @@ public class Parser2
                 error ("P-033", new Object [] { value });
 
             String type = (info == null) ? AttributeDecl.CDATA : info.type;
+            String defaultValue = (info == null) ? null : info.defaultValue;
 
             if (namespaces) {
-                processAttributeNS(attQName, type, value, false);
+                processAttributeNS(attQName, type, value, defaultValue,
+                                   false, false);
             } else {
                 // No namespaces case
-                attTmp.addAttribute("", "", attQName, type, value);
+                attTmp.addAttribute("", "", attQName, type, value,
+                                    defaultValue, false);
             }
 
             haveAttributes = true;
         }
-// XXX old code
-//      if (element != null)
-//          attTmp.setIdAttributeName (element.id);
+        if (element != null)
+            attTmp.setIdAttributeName (element.id);
 
         // if we had ATTLIST decls, handle required & defaulted attributes
         // before telling next layer about this element
@@ -1512,7 +1514,8 @@ public class Parser2
      * <code>nsAttTmp</code>.
      */
     private void processAttributeNS(String attQName, String type,
-                                    String value, boolean isDefaulting)
+                                    String value, String defaultValue,
+                                    boolean isSpecified, boolean isDefaulting)
         throws SAXException
     {
         // assert(namespaces == true)
@@ -1534,7 +1537,7 @@ public class Parser2
             // We may need to add this attribute to appropriate lists
             if (prefixes) {
                 attTmp.addAttribute("", prefix, attQName.intern(),
-                                    type, value);
+                                    type, value, defaultValue, isSpecified);
             } else if (supportValidation && isValidating && !isDefaulting) {
                 // Add this namespace attribute to a different list that
                 // will be used to check for #REQUIRED attributes later.
@@ -1549,7 +1552,7 @@ public class Parser2
             // This isn't a namespace declaration.
             String attName[] = processName(attQName, true);
             attTmp.addAttribute(attName[0], attName[1], attName[2], type,
-                                value);
+                                value, defaultValue, isSpecified);
         }
     }
 
@@ -1667,15 +1670,12 @@ public class Parser2
                     error ("V-010", new Object [] { declAttName });
 
                 if (namespaces) {
-                    processAttributeNS(declAttName, info.type,
-                                       defaultValue, true);
+                    processAttributeNS(declAttName, info.type, defaultValue,
+                                       defaultValue, false, true);
                 } else {
                     attTmp.addAttribute("", "", declAttName, info.type,
-                                        defaultValue);
+                                        defaultValue, defaultValue, false);
                 }
-// XXX old code
-//              attributes.addAttribute (declAttName, info.type,
-//                  info.defaultValue, info.defaultValue, false);
                 didDefault = true;
             }
         }

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id $
  *
  * The Apache Software License, Version 1.1
  *
@@ -58,19 +58,19 @@
 
 package org.apache.crimson.parser;
 
-import org.xml.sax.AttributeList;
+import org.xml.sax.Attributes;
 
 
 /**
- * This interface extends the SAX AttributeList interface to expose
- * information needed to support DOM Level 1 features used in document
+ * This interface extends the SAX Attributes interface to expose
+ * information needed to support DOM Level 2 features used in document
  * editing, and detection of ID attributes which are declared for
  * an element.
  *
  * @author David Brownell
  * @version $Revision$
  */
-public interface AttributeListEx extends AttributeList
+public interface AttributesEx extends Attributes
 {
     /**
      * Returns true if the attribute was specified in the document.

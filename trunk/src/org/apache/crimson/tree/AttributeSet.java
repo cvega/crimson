@@ -69,7 +69,7 @@ import org.w3c.dom.*;
 import org.xml.sax.AttributeList;
 import org.xml.sax.Attributes;
 
-import org.apache.crimson.parser.AttributeListEx;
+import org.apache.crimson.parser.AttributesEx;
 
 
 /**
@@ -127,12 +127,12 @@ class AttributeSet implements NamedNodeMap, XmlWritable
      * <b>DOM2:</b> Create DOM NamedNodeMap from SAX2 Attributes object
      */
     AttributeSet(Attributes source) throws DOMException {
-        int                     len = source.getLength();
-        AttributeListEx         ex = null;
+        int len = source.getLength();
+        AttributesEx ex = null;
 
         list = new Vector(len);
-        if (source instanceof AttributeListEx) { // XXX fix this
-            ex = (AttributeListEx) source;
+        if (source instanceof AttributesEx) {
+            ex = (AttributesEx) source;
         }
 
         for (int i = 0; i < len; i++) {

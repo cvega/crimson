@@ -75,7 +75,6 @@ import org.w3c.dom.EntityReference;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 
-import org.xml.sax.AttributeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
@@ -87,7 +86,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.ext.DeclHandler;
 
-import org.apache.crimson.parser.AttributeListEx;
+import org.apache.crimson.parser.AttributesEx;
 
 
 /**
@@ -486,9 +485,9 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 	    throw new SAXParseException(getMessage("XDB-004",
                     new Object[] { ex.getMessage() }), locator, ex);
 	}
-	if (attributes instanceof AttributeListEx) {
+	if (attributes instanceof AttributesEx) {
 	    e.setIdAttributeName(
-		((AttributeListEx)attributes).getIdAttributeName());
+		((AttributesEx)attributes).getIdAttributeName());
         }
 	if (length != 0) {
 	    e.setAttributes(attSet);

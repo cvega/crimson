@@ -1465,7 +1465,7 @@ public class Parser2
             }
 	} else if (exceptions != null && errHandler != null) {
 	    for (int i = 0; i < exceptions.size(); i++) {
-		errHandler.error((SAXParseException)(exceptions.get(i)));
+		errHandler.error((SAXParseException)(exceptions.elementAt(i)));
             }
         }
 
@@ -1602,7 +1602,7 @@ public class Parser2
             if (exceptions == null) {
                 exceptions = new Vector();
             }
-            exceptions.add(e);
+            exceptions.addElement(e);
             attTmp.addAttribute("", attQName, attQName, type, value,
                                 defaultValue, isSpecified);
         }

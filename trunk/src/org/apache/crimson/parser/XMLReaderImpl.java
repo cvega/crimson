@@ -199,16 +199,22 @@ public class XMLReaderImpl implements XMLReader {
                 parser = null;
             }
             validation = state;
-        } else if (name.equals(STRING_INTERNING)) {
+        } else if (name.equals(STRING_INTERNING) ||
+                   name.equals(EXTERNAL_GENERAL) ||
+                   name.equals(EXTERNAL_PARAMETER)) {
+            checkNotParsing("feature", name);
             if (state == false) {
                 throw new SAXNotSupportedException("Feature: " + name
                                                    + " State: false");
             }
             // else true is OK
-        } else if (name.equals(EXTERNAL_GENERAL) ||
-                   name.equals(EXTERNAL_PARAMETER) ||
-                   name.equals(LEXICAL_PARAMETER_ENTITIES)) {
-            throw new SAXNotSupportedException("Feature: " + name);
+        } else if (name.equals(LEXICAL_PARAMETER_ENTITIES)) {
+            checkNotParsing("feature", name);
+            if (state == true) {
+                throw new SAXNotSupportedException("Feature: " + name
+                                                   + " State: true");
+            }
+            // else false is OK
         } else {
             throw new SAXNotRecognizedException("Feature: " + name);
         }

@@ -110,10 +110,6 @@ public interface Locator {
      *
      * <p>If possible, the SAX driver should provide the line position 
      * of the first character after the text associated with the document 
-     * event.</p>
-     *
-     * <p>If possible, the SAX driver should provide the line position 
-     * of the first character after the text associated with the document 
      * event.  The first column in each line is column 1.</p>
      *
      * @return The column number, or -1 if none is available.

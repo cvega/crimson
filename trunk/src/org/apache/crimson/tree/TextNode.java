@@ -75,8 +75,7 @@ import org.w3c.dom.*;
  * @author David Brownell
  * @version $Revision$
  */
-// public
-class TextNode extends DataNode implements Text
+public class TextNode extends DataNode implements Text
 {
     //
     // XXX Really want a more flexible representation of text than

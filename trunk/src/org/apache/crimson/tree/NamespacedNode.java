@@ -69,7 +69,7 @@ import org.apache.crimson.util.XmlNames;
  * @author Edwin Goei
  * @version $Revision$
  */
-abstract class NamespacedNode extends ParentNode {
+public abstract class NamespacedNode extends ParentNode {
     /**
      * Field "qName" can be used to hold any XML REC "[5] Name" including a
      * Namespaces REC "[6] QName".

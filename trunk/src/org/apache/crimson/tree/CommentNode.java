@@ -71,8 +71,7 @@ import org.w3c.dom.*;
  * @author David Brownell
  * @version $Revision$
  */
-// public
-class CommentNode extends DataNode implements Comment
+public class CommentNode extends DataNode implements Comment
 {
     /** Constructs a comment node. */
     public CommentNode () { }

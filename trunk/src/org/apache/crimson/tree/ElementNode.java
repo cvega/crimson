@@ -460,9 +460,11 @@ public class ElementNode extends NamespacedNode implements ElementEx
         Attr attr = getAttributeNodeNS(namespaceURI,
                 XmlNames.getLocalPart(qualifiedName));
         if (attr == null) {
-            attr = new AttributeNode(namespaceURI, qualifiedName, value,
-                                     true, null);
-            setAttributeNodeNS(attr);
+            AttributeNode newAttr = new AttributeNode(namespaceURI,
+                                                      qualifiedName, value,
+                                                      true, null);
+	    newAttr.setOwnerDocument((XmlDocument)getOwnerDocument());
+            setAttributeNodeNS(newAttr);
         } else {
             attr.setValue(value);
             attr.setPrefix(prefix);

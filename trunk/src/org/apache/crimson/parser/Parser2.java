@@ -679,6 +679,13 @@ public class Parser2
         // [10] AttValue ::=
         //      '"' ([^"&]  | Reference              )* '"'
         //    | "'" ([^'&]  | Reference              )* "'"
+
+        // Only expand PEs in getc() when processing entity value literals
+        // and do not expand when processing AttValue.  Save state of
+        // doLexicalPE and restore it before returning.
+        boolean savedLexicalPE = doLexicalPE;
+        doLexicalPE = isEntityValue;
+
         char            quote = getc ();
         char            c;
         InputEntity     source = in;
@@ -776,6 +783,7 @@ public class Parser2
         }
 
         isInAttribute = false;
+        doLexicalPE = savedLexicalPE;
     }
 
     // does a SINGLE expansion of the entity (often reparsed later)
@@ -1157,12 +1165,6 @@ public class Parser2
 
         // params are no good to anyone starting now -- bye!
         params.clear ();
-
-        // Done processing DTD so we will never be expanding any more PE
-        // refs.  This fixes bug where doc containing internal subset
-        // containing a EntityDecl causes incorrect attribute processing
-        // outside the DTD.
-        doLexicalPE = false;
 
         lexicalHandler.endDTD();
 

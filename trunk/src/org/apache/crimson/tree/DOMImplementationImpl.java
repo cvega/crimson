@@ -92,12 +92,12 @@ public class DOMImplementationImpl implements DOMImplementation
      * be shared with NodeBase.supports().
      */
     static boolean hasFeature0(String feature, String version) {
-	if (!"XML".equalsIgnoreCase(feature)) {
-	    return false;
-        }
-        if (version == null || "".equals(version) || "2.0".equals(version)
-            || "1.0".equals(version)) {
-            return true;
+	if ("XML".equalsIgnoreCase(feature)
+            || "Core".equalsIgnoreCase(feature)) {
+            if (version == null || "".equals(version) || "2.0".equals(version)
+                || "1.0".equals(version)) {
+                return true;
+            }
         }
         return false;
     }

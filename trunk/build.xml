@@ -47,6 +47,7 @@ All generated files are created under ${build.dir}
       deprecation="off" >
       <classpath>
         <pathelement location="${build.classes}" />
+        <pathelement location="lib/jaxp.jar" />
         <pathelement location="src" />
       </classpath>
       <exclude name="**/,**" />
@@ -66,12 +67,11 @@ All generated files are created under ${build.dir}
     </copy>
   </target>
 
-  <target name="jaxp.jar" depends="compile">
-    <jar jarfile="${build.dir}/jaxp.jar"
-      basedir="${build.classes}"
-      manifest="src/META-INF/manifest.javax" >
-      <include name="javax/xml/**" />
-    </jar>
+  <target name="jaxp.jar">
+    <!-- Copy the binary.  XXX The source should be available somewhere
+         under http://java.sun.com/xml as part of the JAXP reference
+         implementation. -->
+    <copy file="lib/jaxp.jar" todir="${build.dir}" />
   </target>
 
   <target name="crimson.jar" depends="compile">

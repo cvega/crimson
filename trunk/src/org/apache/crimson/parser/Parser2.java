@@ -1504,7 +1504,7 @@ public class Parser2
     /**
      * Process attributes for namespace support.  This is mostly common
      * code that gets called from two places and was factored out.  The
-     * <code>defaulting</code> param specifies where the code is called
+     * <code>isDefaulting</code> param specifies where the code is called
      * from.
      *
      * @param isDefaulting true iff we are processing this attribute from
@@ -1522,14 +1522,27 @@ public class Parser2
         // assert(namespaces == true)
 
         if (attQName.startsWith("xmlns")) {
-            // Found a declaration...
+            // Could be a namespace declaration
+
+            boolean defaultNSDecl = attQName.length() == 5;
+            if (!defaultNSDecl && attQName.charAt(5) != ':') {
+                // This isn't a namespace declaration.
+                String attName[] = processName(attQName, true);
+                attTmp.addAttribute(attName[0], attName[1], attName[2], type,
+                                    value, defaultValue, isSpecified);
+                return;
+            }
+
+            // Must be some kind of namespace declaration
             String prefix;
-            int n = attQName.indexOf(':');
-            if (n == -1) {
+            if (defaultNSDecl) {
+                // Default namespace, so use empty string as prefix
                 prefix = "";
             } else {
-                prefix = attQName.substring(n+1);
+                // Non-default namespace decl, extract the prefix
+                prefix = attQName.substring(6);
             }
+
             if (!nsSupport.declarePrefix(prefix, value)) {
                 error("P-083", new Object[] { prefix });
             }

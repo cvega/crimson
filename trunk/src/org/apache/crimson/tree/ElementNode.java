@@ -108,8 +108,6 @@ public class ElementNode extends NamespacedNode implements ElementEx
 
     private static final char	tagStart [] = { '<', '/' };
     private static final char	tagEnd [] = { ' ', '/', '>' };
-    private static final String
-        SPEC_XML_URI = "http://www.w3.org/XML/1998/namespace";
     
     /**
      * Partially constructs an element; its tag will be assigned by the
@@ -179,7 +177,7 @@ public class ElementNode extends NamespacedNode implements ElementEx
         // If we get here then we must have a valid prefix
         if (namespaceURI == null || namespaceURI.equals("")
                 || (prefix.equals("xml") &&
-                    !namespaceURI.equals(SPEC_XML_URI))) {
+                    !XmlNames.SPEC_XML_URI.equals(namespaceURI))) {
             throw new DomEx(DomEx.NAMESPACE_ERR);
         }
     }

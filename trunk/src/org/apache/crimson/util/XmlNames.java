@@ -68,6 +68,14 @@ package org.apache.crimson.util;
  */
 public class XmlNames 
 {
+    /**
+     * Useful strings from the DOM Level 2 Spec
+     */
+    public static final String
+        SPEC_XML_URI = "http://www.w3.org/XML/1998/namespace";
+    public static final String
+        SPEC_XMLNS_URI = "http://www.w3.org/2000/xmlns/";
+
     private XmlNames () { }
 
 

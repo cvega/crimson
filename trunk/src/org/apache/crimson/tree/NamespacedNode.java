@@ -118,6 +118,26 @@ abstract class NamespacedNode extends ParentNode {
 	    return;
 	}
 
+        // Check for illegal characters
+        if (!XmlNames.isUnqualifiedName(prefix)) {
+            throw new DomEx(DomEx.INVALID_CHARACTER_ERR);
+        }
+
+        // Check for NAMESPACE_ERR part 1
+	if (namespaceURI == null
+            || "xml".equals(prefix)
+                && !XmlNames.SPEC_XML_URI.equals(namespaceURI)) {
+            throw new DomEx(DomEx.NAMESPACE_ERR);
+        }
+        // Check for NAMESPACE_ERR part 2
+        if (getNodeType() == ATTRIBUTE_NODE) {
+            if ("xmlns".equals(prefix)
+                    && !XmlNames.SPEC_XMLNS_URI.equals(namespaceURI)
+                || "xmlns".equals(name)) {
+                throw new DomEx(DomEx.NAMESPACE_ERR);
+            }
+        }
+
         // Replace or add new prefix
    	StringBuffer tmp = new StringBuffer(prefix);
 	tmp.append(':');

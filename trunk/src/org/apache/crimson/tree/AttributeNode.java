@@ -114,11 +114,6 @@ class AttributeNode extends NamespacedNode implements Attr
         attribute is set on an ElementNode */
     private Element ownerElement;
 
-    private static final String
-        SPEC_XML_URI = "http://www.w3.org/XML/1998/namespace";
-    static final String
-        SPEC_XMLNS_URI = "http://www.w3.org/2000/xmlns/";
-        
     /** Constructs an attribute node. */
     public AttributeNode(String name, String value,
         boolean specified, String defaultValue)
@@ -167,7 +162,7 @@ class AttributeNode extends NamespacedNode implements Attr
                 throw new DomEx(DomEx.INVALID_CHARACTER_ERR);
             }
             if ("xmlns".equals(qualifiedName) &&
-                !namespaceURI.equals(SPEC_XMLNS_URI)) {
+                !XmlNames.SPEC_XMLNS_URI.equals(namespaceURI)) {
                 throw new DomEx(DomEx.NAMESPACE_ERR);
             }
             return;
@@ -189,7 +184,8 @@ class AttributeNode extends NamespacedNode implements Attr
 
         // If we get here then we must have a valid prefix
         if (namespaceURI == null
-            || ("xml".equals(prefix) && !namespaceURI.equals(SPEC_XML_URI))) {
+            || ("xml".equals(prefix)
+                && !XmlNames.SPEC_XML_URI.equals(namespaceURI))) {
             throw new DomEx(DomEx.NAMESPACE_ERR);
         }
     }

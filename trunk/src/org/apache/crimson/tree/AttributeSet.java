@@ -140,7 +140,7 @@ class AttributeSet implements NamedNodeMap, XmlWritable
             if ("xmlns".equals(qName)
                 || "xmlns".equals(XmlNames.getPrefix(qName))) {
                 // Associate the right namespaceURI with "xmlns" attributes
-                uri = AttributeNode.SPEC_XMLNS_URI;
+                uri = XmlNames.SPEC_XMLNS_URI;
             } else {
                 uri = source.getURI(i);
                 // Translate "" of SAX2 to null.  See DOM2 spec under Node

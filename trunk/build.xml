@@ -1,86 +1,37 @@
 <?xml version="1.0"?> 
 
-<project name="JAXP_unbundled" default="main" basedir=".">
+<project name="crimson" default="all" basedir=".">
 
-<!-- Assume:
-  -->
-
-  <property name="version.suffix" value="-1.1ea2" />
-  <property name="merlin.src" value="../src/share/classes" />
-  <property name="dist.name" value="jaxp${version.suffix}" />
-  <property name="jaxp11.build" value="build/${dist.name}" />
+  <!-- Use the same convention as tomcat, etc - keep the 
+       source tree "clean", common dir for all builds. 
+       That makes interaction between projects much easier -->
+  <property name="crimson.build" value="../build/crimson" />
 
   <!-- Build options -->
   <property name="optimize" value="false" />
   <property name="debug" value="on" />
 
-  <property name="xalan.src" value="../../xml-xalan/java/src" />
-
   <target name="init" >
   </target>
 
-  <target name="update-xalan" >
-    <copydir src="${xalan.src}/org/apache" 
-      dest="${merlin.src}/org/apache" >
-      <exclude name="**/CVS/**" />
-    </copydir>
-    <copydir src="${xalan.src}/org/w3c/dom/range" 
-      dest="${xalan.src}/org/w3c/range" >
-      <exclude name="**/CVS/**" />
-    </copydir>
-    <copydir src="${xalan.src}/org/w3c/dom/traversal" 
-      dest="${xalan.src}/org/w3c/traversal" >
-      <exclude name="**/CVS/**" />
-    </copydir>
-
-    <delete 
-      file="${merlin.src}/org/apache/xalan/processor/CompilingStylesheetHandler.java" />
-    <delete 
-      file="${merlin.src}/org/apache/xalan/processor/CompilingStylesheetProcessor.java" />
-  </target>
-
   <target name="prepare" >
-    <mkdir dir="${jaxp11.build}"/>
-    <mkdir dir="${jaxp11.build}/classes"/>
-    <mkdir dir="${jaxp11.build}/docs"/>
-    <mkdir dir="${jaxp11.build}/docs/api"/>
-    <mkdir dir="${jaxp11.build}/src"/>
-    <mkdir dir="${jaxp11.build}/src/javax"/>
-    <mkdir dir="${jaxp11.build}/src/org"/>
-
-    <copydir src="${merlin.src}/javax/xml" 
-      dest="${jaxp11.build}/src/javax/xml" >
-      <exclude name="**/,**" />
-      <exclude name="**/SCCS/**" />
-    </copydir>
-    <copydir src="${merlin.src}/org/apache" 
-      dest="${jaxp11.build}/src/org/apache" >
-      <exclude name="**/,**" />
-      <exclude name="**/SCCS/**" />
-    </copydir>
-    <copydir src="${merlin.src}/org/xml" 
-      dest="${jaxp11.build}/src/org/xml" >
-      <exclude name="**/,**" />
-      <exclude name="**/SCCS/**" />
-    </copydir>
-    <copydir src="${merlin.src}/org/w3c" 
-      dest="${jaxp11.build}/src/org/w3c" >
-      <exclude name="**/,**" />
-      <exclude name="**/SCCS/**" />
-    </copydir>
+    <mkdir dir="${crimson.build}"/>
+    <mkdir dir="${crimson.build}/classes"/>
+    <mkdir dir="${crimson.build}/docs"/>
+    <mkdir dir="${crimson.build}/docs/api"/>
   </target>
 
   <!-- ==================== Build  ==================== -->
 
   <target name="compile" >
-    <javac srcdir="${jaxp11.build}/src" 
-      destdir="${jaxp11.build}/classes"
+    <javac srcdir="src" 
+      destdir="${crimson.build}/classes"
       debug="${debug}" 
       optimize="${optimize}"
       deprecation="off" >
       <classpath>
-	<pathelement location="${jaxp11.build}/lib/classes" />
-	<pathelement location="${jaxp11.build}/src" />
+	<pathelement location="${crimson.build}/classes" />
+	<pathelement location="src" />
       </classpath>
       <exclude name="**/,**" />
       <exclude name="**/SCCS/**" />
@@ -89,60 +40,42 @@
       <include name="org/xml/**" />
       <include name="org/w3c/**" />
     </javac>
-    <copydir src="${merlin.src}/org/apache" 
-      dest="${jaxp11.build}/classes/org/apache" >
-      <include name="**/**.properties" />
-      <exclude name="**/,**" />
-      <exclude name="**/SCCS/**" />
-    </copydir>
+    <copy 
+      todir="${crimson.build}/classes/org/apache" >
+      <fileset dir="src/org/apache" >
+	<include name="**/**.properties" />
+        <exclude name="**/,**" />
+        <exclude name="**/SCCS/**" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="jaxp.jar" depends="compile">
-    <jar jarfile="${jaxp11.build}/jaxp.jar"
-      basedir="${jaxp11.build}/classes"
-      manifest="src/manifest.javax" >
+    <jar jarfile="${crimson.build}/jaxp.jar"
+      basedir="${crimson.build}/classes" >
       <include name="javax/xml/**" />
     </jar>
   </target>
 
   <target name="crimson.jar" depends="compile">
-    <mkdir dir="${jaxp11.build}/classes/META-INF/services" />
-    <copyfile src="src/services/javax.xml.parsers.DocumentBuilderFactory"
-      dest="${jaxp11.build}/classes/META-INF/services/javax.xml.parsers.DocumentBuilderFactory" />
-    <copyfile src="src/services/javax.xml.parsers.SAXParserFactory"
-      dest="${jaxp11.build}/classes/META-INF/services/javax.xml.parsers.SAXParserFactory" />
-    <jar jarfile="${jaxp11.build}/crimson.jar"
-      basedir="${jaxp11.build}/classes"
-      manifest="src/manifest.crimson" >
+    <mkdir dir="${crimson.build}/classes/META-INF/services" />
+    <copy file="meta-inf/services/javax.xml.parsers.DocumentBuilderFactory"
+      tofile="${crimson.build}/classes/META-INF/services/javax.xml.parsers.DocumentBuilderFactory" />
+    <copy file="src/services/javax.xml.parsers.SAXParserFactory"
+      tofile="${crimson.build}/classes/META-INF/services/javax.xml.parsers.SAXParserFactory" />
+    <jar jarfile="${crimson.build}/crimson.jar"
+      basedir="${crimson.build}/classes"
+      manifest="meta-inf/manifest.crimson" >
       <include name="org/apache/crimson/**" />
       <include name="org/xml/**" />
       <include name="org/w3c/**" /> 
     </jar>
-    <deltree dir="${jaxp11.build}/classes/META-INF" />
-  </target>
-
-
-  <target name="xalan.jar" depends="compile">
-    <mkdir dir="${jaxp11.build}/classes/META-INF/services" />
-    <copyfile src="src/services/javax.xml.transform.TransformerFactory"
-      dest="${jaxp11.build}/classes/META-INF/services/javax.xml.transform.TransformerFactory" />
-    <jar jarfile="${jaxp11.build}/xalan.jar"
-      basedir="${jaxp11.build}/classes"
-      manifest="src/manifest.xalan" >
-      <include name="org/apache/xalan/**" />
-      <include name="org/apache/xpath/**" />
-      <include name="org/apache/serialize/**" />
-      <include name="org/apache/trax/**" />
-      <include name="org/apache/xml/**" />
-      <include name="META-INF/**" />
-    </jar>
-    <deltree dir="${jaxp11.build}/classes/META-INF" />
   </target>
 
   <target name="javadoc">
-    <javadoc packagenames="javax.xml.*,org.w3c.*,org.xml.*"
-      sourcepath="${jaxp11.build}/src"
-      destdir="${jaxp11.build}/docs/api"
+    <javadoc packagenames="org.w3c.*,org.xml.*"
+      sourcepath="src"
+      destdir="${crimson.build}/docs/api"
       author="true"
       version="true"
       use="true"
@@ -153,37 +86,30 @@
 
   <target name="other.doc">
     <copyfile src="docs/readme.html" 
-      dest="${jaxp11.build}/readme.html"
+      dest="${crimson.build}/readme.html"
       />
     <copyfile src="docs/install.html" 
-      dest="${jaxp11.build}/install.html"
+      dest="${crimson.build}/install.html"
       />
     <copyfile src="docs/License-RI.html" 
-      dest="${jaxp11.build}/License-RI.html"
+      dest="${crimson.build}/License-RI.html"
       />
     <copyfile src="docs/License-ASF" 
-      dest="${jaxp11.build}/License-ASF"
+      dest="${crimson.build}/License-ASF"
       />
   </target>
 
   <target name="dist" depends="prepare,all,javadoc,other.doc" >
-    <zip zipfile="${jaxp11.build}/src.zip"
-      basedir="${jaxp11.build}/src">
-      <include name="javax/xml/**" />
-      <include name="org/xml/**" />
-      <include name="org/w3c/**" />
-    </zip>
     <zip zipfile="${dist.name}.zip"
-      basedir="${jaxp11.build}/..">
+      basedir="${crimson.build}">
       <include name="${dist.name}/License-ASF" />
       <include name="${dist.name}/*.html" />
       <include name="${dist.name}/*.jar" />
-      <include name="${dist.name}/src.zip" />
       <include name="${dist.name}/docs/**" />
     </zip>
   </target>
 
-  <target name="all" depends="compile,jaxp.jar,crimson.jar,xalan.jar">
+  <target name="all" depends="prepare,compile,jaxp.jar,crimson.jar">
   </target>
 
   <target name="main" depends="prepare,all,dist">

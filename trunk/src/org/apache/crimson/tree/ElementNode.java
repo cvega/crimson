@@ -91,7 +91,7 @@ public class ElementNode extends ElementNode2
         ElementNode2 retval = new ElementNode(qName);
         if (attributes != null) {
             retval.attributes = new AttributeSet(attributes, true);
-            retval.attributes.setOwnerElement(this);
+            retval.attributes.setOwnerElement(retval);
         }
         retval.setIdAttributeName(getIdAttributeName());
         retval.setUserObject(getUserObject());

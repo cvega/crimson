@@ -1111,7 +1111,8 @@ public class XmlDocument extends ParentNode implements DocumentEx
      * Changes the "owner document" of the given node, and all child
      * and associated attribute nodes, to be this document.  If the
      * node has a parent, it is first removed from that parent.
-     * <b>Obsolete</b> Use importNode method instead.
+     * <b>Obsolete</b> Use importNode method instead.  Still useful for
+     * internal implementation.
      * 
      * @param node
      * @exception DOMException WRONG_DOCUMENT_ERROR when attempting

@@ -704,6 +704,7 @@ final class InputEntity implements Locator
 			white = false;
 		    continue;
 		}
+                // assert(buf[last] == ']');
 		if ((last + 2) < finish) {
 		    if (buf [last + 1] == ']' && buf [last + 2] == '>') {
 			done = true;
@@ -712,10 +713,11 @@ final class InputEntity implements Locator
 		    white = false;
 		    continue;
 		} else {
-		    last--;
-		    fillbuf ();
-		    last = start - 1;
-		    //break;
+                    // "last" is at or one before end of buffered data.
+                    // Report what we have so far, not including "last", by
+                    // breaking and executing code below, outside inner
+                    // loop, then continuing on to find end of CDATA section.
+                    break;
 		}
 	    }
 	    if (white) {
@@ -734,6 +736,7 @@ final class InputEntity implements Locator
 		break;
 	    }
 	    start = last;
+            fillbuf();
 	    if (isEOF ())
 		fatal ("P-073", null);
 	}

@@ -369,19 +369,26 @@ class AttributeSet implements NamedNodeMap, XmlWritable
             throw new DomEx(DomEx.INUSE_ATTRIBUTE_ERR);
         }
 
-        for (int i = 0; i < list.size(); i++) {
+        int length = list.size();
+        for (int i = 0; i < length; i++) {
             AttributeNode oldNode = (AttributeNode) item(i);
             String localName = oldNode.getLocalName();
             String namespaceURI = oldNode.getNamespaceURI();
             if (attr.getLocalName().equals(localName)
                 && attr.getNamespaceURI().equals(namespaceURI)) {
                 // Found a matching node so replace it
+                if (oldNode.isReadonly()) {
+                    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
+                }
+                attr.setOwnerElement(ownerElement);
                 list.setElementAt(attr, i);
+		oldNode.setOwnerElement(null);
                 return oldNode;
             }
         }
 
         // Append instead of replace
+        attr.setOwnerElement(ownerElement);
         list.addElement(attr);
         return null;
     }

@@ -486,7 +486,7 @@ public class ElementNode extends NamespacedNode implements ElementEx
         }
 
         // Note: ownerElement of newAttr is both checked and set in the
-        // following call to AttributeSet.setNamedItem(Node)
+        // following call to AttributeSet.setNamedItemNS(Node)
 	return (Attr)attributes.setNamedItemNS(newAttr);
     }
 

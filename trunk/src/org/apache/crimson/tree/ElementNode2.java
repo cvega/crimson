@@ -413,7 +413,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
     }
 
     /**
-     *  Retrieves an <code>Attr</code> node by local name and namespace URI. 
+     * Retrieves an <code>Attr</code> node by local name and namespace URI. 
      * @since DOM Level 2
      */
     public Attr getAttributeNodeNS(String namespaceURI, String localName) {
@@ -428,7 +428,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
             if (attr == null) {
                 return null;
             }
-            if (attr.getLocalName().equals(localName)
+            if (localName.equals(attr.getLocalName())
                 && (attr.getNamespaceURI() == namespaceURI
                     || attr.getNamespaceURI().equals(namespaceURI))) {
                 return attr;

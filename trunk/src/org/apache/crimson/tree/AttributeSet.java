@@ -300,15 +300,21 @@ class AttributeSet implements NamedNodeMap, XmlWritable
      * <b>DOM2:</b>
      */
     public Node getNamedItemNS(String namespaceURI, String localName) {
+        // DOM L2 spec specifies that Attr.localName is null for L1 created
+        // Attr and Element nodes, therefore this method cannot be used to
+        // lookup such a node.
+        if (localName == null) {
+            return null;
+        }
+
         for (int i = 0; i < list.size(); i++) {
             Node value = item(i);
             String iLocalName = value.getLocalName();
-            // assert(iLocalName != null);
-            if (iLocalName.equals(localName)) {
+            if (localName.equals(iLocalName)) {
                 String iNamespaceURI = value.getNamespaceURI();
-                if (iNamespaceURI == namespaceURI ||
-                    (iNamespaceURI != null
-                     && iNamespaceURI.equals(namespaceURI))) {
+                if (namespaceURI == iNamespaceURI ||
+                    (namespaceURI != null
+                     && namespaceURI.equals(iNamespaceURI))) {
                     return value;
                 }
             }
@@ -366,15 +372,19 @@ class AttributeSet implements NamedNodeMap, XmlWritable
             throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
         }
 
+        // See comments for getNamedItemNS() for why localName cannot be null
+        if (localName == null) {
+            throw new DomEx(DomEx.NOT_FOUND_ERR);
+        }
+
         for (int i = 0; i < list.size(); i++) {
             Node value = (Node)list.elementAt(i);
             String iLocalName = value.getLocalName();
-            // assert(iLocalName != null);
-            if (iLocalName.equals(localName)) {
+            if (localName.equals(iLocalName)) {
                 String iNamespaceURI = value.getNamespaceURI();
-                if (iNamespaceURI == namespaceURI ||
-                    (iNamespaceURI != null
-                     && iNamespaceURI.equals(namespaceURI))) {
+                if (namespaceURI == iNamespaceURI ||
+                    (namespaceURI != null
+                     && namespaceURI.equals(iNamespaceURI))) {
                     // Found a match
                     list.removeElementAt(i);
 
@@ -438,7 +448,7 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     
     /**
      * <b>DOM2:</b>
-     * XXX spec technically allows Element nodes also, but this code
+     * Spec technically allows other types of nodes also, but this code
      * assumes Attr nodes only
      */
     public Node setNamedItemNS(Node arg) throws DOMException {
@@ -456,13 +466,21 @@ class AttributeSet implements NamedNodeMap, XmlWritable
             throw new DomEx(DomEx.INUSE_ATTRIBUTE_ERR);
         }
 
+        // Both localName and namespaceURI can be null for Attr nodes
+        // created by DOM Level 1 methods
+        String localName = attr.getLocalName();
+        String namespaceURI = attr.getNamespaceURI();
+
         int length = list.size();
         for (int i = 0; i < length; i++) {
             AttributeNode oldNode = (AttributeNode) item(i);
-            String localName = oldNode.getLocalName();
-            String namespaceURI = oldNode.getNamespaceURI();
-            if (attr.getLocalName().equals(localName)
-                && attr.getNamespaceURI().equals(namespaceURI)) {
+            String iLocalName = oldNode.getLocalName();
+            String iNamespaceURI = oldNode.getNamespaceURI();
+            if ((localName == iLocalName ||
+                 (localName != null && localName.equals(iLocalName)))
+                && (namespaceURI == iNamespaceURI ||
+                    (namespaceURI != null
+                     && namespaceURI.equals(iNamespaceURI)))) {
                 // Found a matching node so replace it
                 if (oldNode.isReadonly()) {
                     throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);

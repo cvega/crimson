@@ -388,7 +388,8 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
                 return null;
             }
             if (attr.getLocalName().equals(localName)
-                && attr.getNamespaceURI().equals(namespaceURI)) {
+                && (attr.getNamespaceURI() == namespaceURI
+                    || attr.getNamespaceURI().equals(namespaceURI))) {
                 return attr;
             }
         }

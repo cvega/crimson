@@ -4,7 +4,7 @@
 This is an ant build file compatible with ant version 1.2.
 
 Useful targets:
-    + jars      jar  the default target to make jar files
+    + jars jar  the default target to make jar files
     + dist      creates a crimson-[version].zip file
     + clean     deletes all generated files
 

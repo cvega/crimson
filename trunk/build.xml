@@ -14,7 +14,7 @@ All generated files are created under ${build.dir}
 <project name="crimson" default="jars" basedir=".">
 
   <!-- Use this property to set version of crimson -->
-  <property name="version" value="1.1" />
+  <property name="impl.version" value="1.1.1" />
   <property name="name" value="crimson"/>
 
   <!-- Build options -->
@@ -29,7 +29,7 @@ All generated files are created under ${build.dir}
   <property name="build.dir" value="../build/${name}" />
   <property name="build.classes" value="${build.dir}/classes"/>
 
-  <property name="dist.file" value="${name}-${version}" />
+  <property name="dist.file" value="${name}-${impl.version}" />
   <property name="dist.dir" value="${build.dir}/${dist.file}"/>
 
   <target name="prepare" >
@@ -68,9 +68,7 @@ All generated files are created under ${build.dir}
   </target>
 
   <target name="jaxp.jar">
-    <!-- Copy the binary.  XXX The source should be available somewhere
-         under http://java.sun.com/xml as part of the JAXP reference
-         implementation. -->
+    <!-- Copy the binary.  XXX The source is available under xml-commons. -->
     <copy file="lib/jaxp.jar" todir="${build.dir}" />
   </target>
 
@@ -107,7 +105,7 @@ All generated files are created under ${build.dir}
              version="true"
              use="true"
              windowtitle="JAXP 1.1"
-             doctitle="Java API for XML Parsing ${version}" />
+             doctitle="Java API for XML Processing 1.1" />
     -->
     <unjar src="jaxp-javadoc.jar" dest="${build.dir}/docs"/>
   </target>

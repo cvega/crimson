@@ -2248,7 +2248,36 @@ public class Parser2
             if (!ignoreDeclarations
                     && element.attributes.get (a.name) == null) {
                 element.attributes.put (a.name, a);
-                declHandler.attributeDecl(element.name, a.name, a.type,
+
+                // Report attribute declaration to SAX DeclHandler
+                String saxType;
+                if (a.type == AttributeDecl.ENUMERATION
+                        || a.type == AttributeDecl.NOTATION) {
+                    StringBuffer fullType = new StringBuffer();
+
+                    if (a.type == AttributeDecl.NOTATION) {
+                        fullType.append(a.type);
+                        fullType.append(" ");
+                    }
+
+                    if (a.values.length > 1) {
+                        fullType.append("(");
+                    }
+                    for (int i = 0; i < a.values.length; i++) {
+                        fullType.append(a.values[i]);
+                        if (i + 1 < a.values.length) {
+                            fullType.append("|");
+                        }
+                    }
+                    if (a.values.length > 1) {
+                        fullType.append(")");
+                    }
+
+                    saxType = fullType.toString();
+                } else {
+                    saxType = a.type;
+                }
+                declHandler.attributeDecl(element.name, a.name, saxType,
                                           a.valueDefault, a.defaultValue);
             }
             maybeWhitespace ();

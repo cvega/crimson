@@ -71,7 +71,7 @@ import org.apache.crimson.parser.XMLReaderImpl;
 
 import org.apache.crimson.tree.XmlDocument;
 import org.apache.crimson.tree.XmlDocumentBuilder;
-import org.apache.crimson.tree.XmlDocumentBuilder2;
+import org.apache.crimson.tree.XmlDocumentBuilderNS;
 import org.apache.crimson.tree.DOMImplementationImpl;
 
 import org.xml.sax.XMLReader;
@@ -124,19 +124,14 @@ public class DocumentBuilderImpl extends DocumentBuilder {
                     "http://xml.org/sax/features/namespace-prefixes";
             xmlReader.setFeature(nsPrefixes, true);
 
+            // Set SAX2 namespaces feature appropriately
+            String namespaces = "http://xml.org/sax/features/namespaces";
+            xmlReader.setFeature(namespaces, namespaceAware);
+
+            // Use the appropriate DOM builder based on "namespaceAware"
             if (namespaceAware) {
-                // Namespace requirements for DOM Level 2 XmlDocumentBuilder
-                String namespaces = "http://xml.org/sax/features/namespaces";
-                xmlReader.setFeature(namespaces, true);
-
-                // Create XmlDocumentBuilder instance
-                builder = new XmlDocumentBuilder2();
+                builder = new XmlDocumentBuilderNS();
             } else {
-                // Namespace requirements for DOM Level 1 XmlDocumentBuilder
-                String namespaces = "http://xml.org/sax/features/namespaces";
-                xmlReader.setFeature(namespaces, false);
-
-                // Create XmlDocumentBuilder instance
                 builder = new XmlDocumentBuilder();
             }
 

@@ -67,11 +67,11 @@ import org.w3c.dom.DOMException;
 import org.apache.crimson.parser.AttributesEx;
 
 /**
- * This class implements a DOM tree builder which uses DOM Level 2 create
- * methods and assumes disableNamespaces is false, ie. namespaceAware is
- * true.
+ * This class implements a Namespace aware DOM tree builder which uses NS
+ * versions of the DOM Level 2 create methods and assumes disableNamespaces
+ * is false, ie. JAXP namespaceAware is true.
  */
-public class XmlDocumentBuilder2 extends XmlDocumentBuilder
+public class XmlDocumentBuilderNS extends XmlDocumentBuilder
 {
     /**
      * Receive notification of the beginning of an element.
@@ -140,6 +140,11 @@ public class XmlDocumentBuilder2 extends XmlDocumentBuilder
         super.processingInstruction(name, instruction);
     }
 
+
+    //////////////////////////////////////////////////////////////////////
+    // org.xml.sax.ext.DeclHandler callbacks
+    //////////////////////////////////////////////////////////////////////
+
     /**
      * Report an internal entity declaration.
      */
@@ -164,6 +169,7 @@ public class XmlDocumentBuilder2 extends XmlDocumentBuilder
         }
         super.externalEntityDecl(name, publicId, systemId);
     }
+
 
     //////////////////////////////////////////////////////////////////////
     // org.xml.sax.DTDHandler callbacks

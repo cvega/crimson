@@ -925,7 +925,12 @@ public class Parser2
             // Convert string to array of chars
             int length = strTmp.length();
             char[] charArray = new char[length];
-            strTmp.getChars(0, length, charArray, 0);
+            if (length != 0) {
+                // XXX Avoid calling getChars on zero-size array as a
+                // workaround for a bug that occurs in at least JDK1.2.2
+                // which has since been fixed in JDK1.3
+                strTmp.getChars(0, length, charArray, 0);
+            }
             lexicalHandler.comment(charArray, 0, length);
         }
         return true;

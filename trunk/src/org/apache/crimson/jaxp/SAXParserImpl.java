@@ -74,6 +74,8 @@ import org.xml.sax.SAXNotSupportedException;
 
 import org.apache.crimson.parser.XMLReaderImpl;
 
+import java.util.*;
+
 /**
  * @author Rajiv Mordani
  * @version $Revision$
@@ -92,27 +94,22 @@ public class SAXParserImpl extends SAXParser {
     private boolean namespaceAware = false;
     
     SAXParserImpl(SAXParserFactory spf)
-        throws SAXException, ParserConfigurationException 
+        throws SAXNotSupportedException, SAXNotRecognizedException
     {
         this.spf = spf;
 
         xmlReader = new XMLReaderImpl();
 
-        try {
-            // Validation
-            validating = spf.isValidating();
-            String validation = "http://xml.org/sax/features/validation";
-            xmlReader.setFeature(validation, validating);
+        // Validation
+        validating = spf.isValidating();
+        String validation = "http://xml.org/sax/features/validation";
+        xmlReader.setFeature(validation, validating);
 
-            // If validating, provide a default ErrorHandler that prints
-            // validation errors with a warning telling the user to set an
-            // ErrorHandler
-            if (validating) {
-                xmlReader.setErrorHandler(new DefaultValidationErrorHandler());
-            }
-        } catch (SAXException e) {
-            // Handles both SAXNotSupportedException, SAXNotRecognizedException
-            throw new ParserConfigurationException(e.getMessage());
+        // If validating, provide a default ErrorHandler that prints
+        // validation errors with a warning telling the user to set an
+        // ErrorHandler
+        if (validating) {
+            xmlReader.setErrorHandler(new DefaultValidationErrorHandler());
         }
 
         if (spf.isNamespaceAware()) {
@@ -120,6 +117,25 @@ public class SAXParserImpl extends SAXParser {
 	    // XXX ??? Crimson does support namespaces, isn't it ??
 	    //             throw new ParserConfigurationException(
 	    //                 "Namespace not supported by SAXParser");
+        }
+    }
+
+    /**
+     * Set any features of our XMLReader based on any features set on the
+     * SAXParserFactory.
+     *
+     * XXX Does not handle possible conflicts between SAX feature names and
+     * JAXP specific feature names, eg. SAXParserFactory.isValidating()
+     */
+    void setFeatures(Hashtable features)
+        throws SAXNotSupportedException, SAXNotRecognizedException
+    {
+        if (features != null) {
+            for (Enumeration e = features.keys(); e.hasMoreElements();) {
+                String feature = (String)e.nextElement();
+                boolean value = ((Boolean)features.get(feature)).booleanValue();
+                xmlReader.setFeature(feature, value);
+            }
         }
     }
 

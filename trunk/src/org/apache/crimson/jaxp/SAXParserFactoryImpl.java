@@ -65,6 +65,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.XMLReader;
+
+import java.util.Hashtable;
 
 /**
  * @author Rajiv Mordani
@@ -77,9 +80,26 @@ import org.xml.sax.SAXNotSupportedException;
  * default implementation for the platform.
  */
 public class SAXParserFactoryImpl extends SAXParserFactory {
+    private Hashtable features;
 
     public SAXParserFactoryImpl() {
    	 
+    }
+
+    /**
+     * Create a new SAXParser and set SAX features but throwing subclasses
+     * of SAXException
+     */
+    private SAXParser newSAXParser0()
+        throws SAXNotSupportedException, SAXNotRecognizedException
+    {
+        // XXX Does not handle possible conflicts between SAX feature names
+        // and JAXP specific feature names,
+        // eg. SAXParserFactory.isValidating() and
+        // http://xml.org/sax/features/validation
+        SAXParserImpl saxParserImpl = new SAXParserImpl(this);
+        saxParserImpl.setFeatures(features);
+        return saxParserImpl;
     }
 
     /**
@@ -90,7 +110,14 @@ public class SAXParserFactoryImpl extends SAXParserFactory {
     public SAXParser newSAXParser()
         throws SAXException, ParserConfigurationException
     {
-    	SAXParserImpl saxParserImpl = new SAXParserImpl(this);
+        SAXParser saxParserImpl;
+        try {
+            saxParserImpl = newSAXParser0();
+        } catch (SAXException se) {
+            // Handles both SAXNotSupportedException,
+            // SAXNotRecognizedException
+            throw new ParserConfigurationException(se.getMessage());
+        }
 	return saxParserImpl;
     }
 
@@ -102,7 +129,15 @@ public class SAXParserFactoryImpl extends SAXParserFactory {
         throws ParserConfigurationException, SAXNotRecognizedException, 
 		SAXNotSupportedException
     {
-        throw new SAXNotRecognizedException("Feature: " + name);
+        // XXX This is ugly.  We have to collect the features and then
+        // later create an XMLReader to verify the features.
+        if (features == null) {
+            features = new Hashtable();
+        }
+        features.put(name, new Boolean(value));
+
+        // Test the feature by possibly throwing SAX exceptions
+        newSAXParser0();
     }
 
     /**
@@ -113,6 +148,17 @@ public class SAXParserFactoryImpl extends SAXParserFactory {
         throws ParserConfigurationException, SAXNotRecognizedException,
 		SAXNotSupportedException
     {
-        throw new SAXNotRecognizedException("Feature: " + name);
+        // Create an XMLReader and get feature value.
+        XMLReader xmlReader;
+        try {
+            xmlReader = newSAXParser0().getXMLReader();
+        } catch (SAXNotSupportedException e) {
+            throw e;
+        } catch (SAXNotRecognizedException e) {
+            throw e;
+        } catch (SAXException se) {
+            throw new ParserConfigurationException(se.getMessage());
+        }            
+        return xmlReader.getFeature(name);
     }
 }

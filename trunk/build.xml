@@ -230,6 +230,9 @@ downloads a source distribution and unpacks it, then case #2 should be used.
     <delete dir="${distbin.dir}"/>
     <mkdir dir="${distbin.dir}"/>
 
+    <!-- Copy the LICENSE file -->
+    <copy file="LICENSE" tofile="${distbin.dir}/LICENSE"/>
+
     <!-- Copy the built jar files -->
     <copy todir="${distbin.dir}">
       <fileset dir="${build.dir}">
@@ -268,6 +271,9 @@ downloads a source distribution and unpacks it, then case #2 should be used.
     <echo message="Building the source distribution files (zip, tar)"/>
     <delete dir="${distsrc.dir}"/>
     <mkdir dir="${distsrc.dir}"/>
+
+    <!-- Copy the LICENSE file -->
+    <copy file="LICENSE" tofile="${distsrc.dir}/LICENSE"/>
 
     <copy todir="${distsrc.dir}">
       <fileset dir=".">

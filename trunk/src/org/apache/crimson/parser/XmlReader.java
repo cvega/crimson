@@ -65,7 +65,7 @@ import java.util.Hashtable;
 // NOTE:  Add I18N support to this class when JDK gets the ability to
 // defer selection of locale for exception messages ... use the same
 // technique for both.
-
+//
 
 /**
  * This handles several XML-related tasks that normal java.io Readers

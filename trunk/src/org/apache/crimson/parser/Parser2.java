@@ -1330,6 +1330,11 @@ public class Parser2
         // in some cases it's required, though superfluous
         boolean         sawWhite = in.maybeWhitespace ();
 
+        // These are exceptions from the first pass; they should be ignored
+        // if there's a second pass, but reported otherwise.  A second pass
+        // occurs when a namespace declaration is found in the first pass.
+	Vector exceptions = null;
+
         // SAX2 Namespace processing
         if (namespaces) {
             nsSupport.pushContext();
@@ -1408,8 +1413,9 @@ public class Parser2
             String defaultValue = (info == null) ? null : info.defaultValue;
 
             if (namespaces) {
-                processAttributeNS(attQName, type, value, defaultValue,
-                                   true, false);
+                exceptions = processAttributeNS(attQName, type, value,
+                                                defaultValue, true, false,
+                                                exceptions);
             } else {
                 // No namespaces case
                 attTmp.addAttribute("", "", attQName, type, value,
@@ -1436,17 +1442,29 @@ public class Parser2
             int length = attTmp.getLength();
             for (int i = 0; i < length; i++) {
                 String attQName = attTmp.getQName(i);
-                if (!attQName.startsWith("xmlns")) {
-                    String attName[] = processName(attQName, true);
-                    attTmp.setURI(i, attName[0]);
-                    attTmp.setLocalName(i, attName[1]);
+                if (attQName.startsWith("xmlns")) {
+                    // Could be a namespace declaration
+
+                    if (attQName.length() == 5 || attQName.charAt(5) == ':') {
+                        // Default or non-default NS declaration
+                        continue;
+                    }
                 }
+
+                // assert(not a namespace declaration)
+                String attName[] = processName(attQName, true, false);
+                attTmp.setURI(i, attName[0]);
+                attTmp.setLocalName(i, attName[1]);
+            }
+	} else if (exceptions != null && errHandler != null) {
+	    for (int i = 0; i < exceptions.size(); i++) {
+		errHandler.error((SAXParseException)(exceptions.get(i)));
             }
         }
 
         // OK, finally report the event.
         if (namespaces) {
-            String[] parts = processName(name.name, false);
+            String[] parts = processName(name.name, false, false);
             contentHandler.startElement(parts[0], parts[1], parts[2], attTmp);
         } else {
             contentHandler.startElement("", "", name.name, attTmp);
@@ -1484,7 +1502,7 @@ public class Parser2
             // Split the name.  Unfortunately, we can't always reuse the
             // info from the startElement event above b/c this element may
             // have subelements and a global temporary is used.
-            String[] parts = processName(name.name, false);
+            String[] parts = processName(name.name, false, false);
 
             // Report appropriate events...
             contentHandler.endElement(parts[0], parts[1], parts[2]);
@@ -1510,27 +1528,30 @@ public class Parser2
      * @param isDefaulting true iff we are processing this attribute from
      *                     the <code>defaultAttributes(...)</code> method
      *
+     * The namespace processing code is derived from the SAX2 ParserAdapter
+     * code.  This code should be kept in sync with ParserAdapter bug
+     * fixes.
+     *
      * Note: Modifies <code>seenNSDecl</code> iff a xmlns attribute, ie a
      * namespace decl, was found.  Modifies <code>attTmp</code> and
      * <code>nsAttTmp</code>.
      */
-    private void processAttributeNS(String attQName, String type,
-                                    String value, String defaultValue,
-                                    boolean isSpecified, boolean isDefaulting)
+    private Vector processAttributeNS(String attQName, String type,
+                                      String value, String defaultValue,
+                                      boolean isSpecified, boolean isDefaulting,
+                                      Vector exceptions)
         throws SAXException
     {
         // assert(namespaces == true)
 
+      nonNamespace:
         if (attQName.startsWith("xmlns")) {
             // Could be a namespace declaration
 
             boolean defaultNSDecl = attQName.length() == 5;
             if (!defaultNSDecl && attQName.charAt(5) != ':') {
-                // This isn't a namespace declaration.
-                String attName[] = processName(attQName, true);
-                attTmp.addAttribute(attName[0], attName[1], attName[2], type,
-                                    value, defaultValue, isSpecified);
-                return;
+                // Not a namespace declaration
+                break nonNamespace;
             }
 
             // Must be some kind of namespace declaration
@@ -1562,12 +1583,23 @@ public class Parser2
                 nsAttTmp.addElement(attQName);
             }
             seenNSDecl = true;
-        } else {
-            // This isn't a namespace declaration.
-            String attName[] = processName(attQName, true);
+            return exceptions;
+        }
+
+        // This isn't a namespace declaration.
+        try {
+            String attName[] = processName(attQName, true, true);
             attTmp.addAttribute(attName[0], attName[1], attName[2], type,
                                 value, defaultValue, isSpecified);
+        } catch (SAXException e) {
+            if (exceptions == null) {
+                exceptions = new Vector();
+            }
+            exceptions.add(e);
+            attTmp.addAttribute("", attQName, attQName, type, value,
+                                defaultValue, isSpecified);
         }
+        return exceptions;
     }
 
     /**
@@ -1583,7 +1615,8 @@ public class Parser2
      * @exception org.xml.sax.SAXException The client may throw
      *            an exception if there is an error callback.
      */
-    private String[] processName(String qName, boolean isAttribute)
+    private String[] processName(String qName, boolean isAttribute,
+                                 boolean useException)
         throws SAXException
     {
         // assert(namespaces == true)
@@ -1591,11 +1624,20 @@ public class Parser2
                                                isAttribute);
         if (parts == null) {
             parts = new String[3];
+            // SAX should use "" instead of null for parts 0 and 1 ???
             parts[0] = "";
             String localName = XmlNames.getLocalPart(qName);
             parts[1] = localName != null ? localName.intern() : "";
             parts[2] = qName.intern();
-            error("P-084", new Object[] { qName });
+
+            String messageId = "P-084";
+            Object[] parameters = new Object[] { qName };
+	    if (useException) {
+                throw new SAXParseException(
+                    messages.getMessage(locale, messageId, parameters),
+                    locator);
+            }
+            error(messageId, parameters);
         }
         return parts;
     }
@@ -1688,7 +1730,7 @@ public class Parser2
 
                 if (namespaces) {
                     processAttributeNS(declAttName, info.type, defaultValue,
-                                       defaultValue, false, true);
+                                       defaultValue, false, true, null);
                 } else {
                     attTmp.addAttribute("", "", declAttName, info.type,
                                         defaultValue, defaultValue, false);

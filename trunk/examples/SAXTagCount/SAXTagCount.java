@@ -69,7 +69,9 @@ import java.io.*;
  *
  * Notes: DefaultHandler is a SAX helper class that implements the SAX
  * ContentHandler interface by providing no-op methods.  This class
- * overrides some of the methods by extending DefaultHandler.
+ * overrides some of the methods by extending DefaultHandler.  This program
+ * does not turn on namespace processing and uses SAX2 interfaces to
+ * process XML documents which may or may not be using namespaces.
  *
  * @author Edwin Goei <edwingo@apache.org>
  */
@@ -84,10 +86,10 @@ public class SAXTagCount extends DefaultHandler {
 
     // Parser calls this for each element in a document
     public void startElement(String namespaceURI, String localName,
-                             String rawName, Attributes atts)
+                             String qName, Attributes atts)
 	throws SAXException
     {
-        String key = localName;
+        String key = qName;
         Object value = tags.get(key);
         if (value == null) {
             // Add a new entry

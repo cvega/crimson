@@ -5,7 +5,7 @@ Specification-Title: Java API for XML Parsing
 Specification-Version: 1.1
 Specification-Vendor: Sun Microsystems Inc.
 Implementation-Title: javax.xml.parsers
-Implementation-Version: 1.1
+Implementation-Version: 1.1.1
 Implementation-Vendor: Sun Microsystems Inc.
 
 Name: javax/xml/transform/
@@ -13,5 +13,5 @@ Specification-Title: Java API for XML Parsing
 Specification-Version: 1.1
 Specification-Vendor: Sun Microsystems Inc.
 Implementation-Title: javax.xml.transform
-Implementation-Version: 1.1
+Implementation-Version: 1.1.1
 Implementation-Vendor: Sun Microsystems Inc.

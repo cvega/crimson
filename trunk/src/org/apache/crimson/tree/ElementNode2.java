@@ -139,9 +139,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
      *
      * Used to implement Document.importNode().
      */
-    ElementNode2 createCopyForImportNode(boolean deep,
-                                         XmlDocument newOwnerDocument)
-    {
+    ElementNode2 createCopyForImportNode(boolean deep) {
         ElementNode2 retval = new ElementNode2(namespaceURI, qName);
         if (attributes != null) {
             // Copy only "specified" Attr-s
@@ -149,7 +147,6 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
             retval.attributes.setOwnerElement(retval);
         }
         retval.userObject = userObject;
-        retval.ownerDocument = newOwnerDocument;
 
         if (deep) {
             for (int i = 0; true; i++) {
@@ -159,8 +156,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
                 }
                 if (node instanceof ElementNode2) {
                     retval.appendChild(
-                        ((ElementNode2) node).createCopyForImportNode(
-                            true, newOwnerDocument));
+                        ((ElementNode2) node).createCopyForImportNode(true));
                 } else {
                     retval.appendChild(node.cloneNode(true));
                 }

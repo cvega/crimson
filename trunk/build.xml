@@ -14,7 +14,7 @@ All generated files are created under ${build.dir}
 <project name="crimson" default="jars" basedir=".">
 
   <!-- Use this property to set version of crimson -->
-  <property name="version" value="1.1ea2" />
+  <property name="version" value="1.1" />
   <property name="name" value="crimson"/>
 
   <!-- Build options -->
@@ -113,13 +113,10 @@ All generated files are created under ${build.dir}
   </target>
 
   <target name="other.doc">
-    <copyfile src="docs/readme.html" dest="${build.dir}/readme.html" />
-    <copyfile src="docs/install.html" dest="${build.dir}/install.html" />
-    <copyfile src="docs/License-RI.html" dest="${build.dir}/License-RI.html" />
-    <copyfile src="docs/License-ASF" dest="${build.dir}/License-ASF" />
+    <copy file="docs/README.txt" todir="${dist.dir}" />
   </target>
 
-  <target name="dist" depends="jars,javadoc" >
+  <target name="dist" depends="jars,javadoc,other.doc" >
     <!-- Copy the jar files -->
     <copy file="${build.dir}/${name}.jar" todir="${dist.dir}" />
     <copy file="${build.dir}/jaxp.jar" todir="${dist.dir}" />

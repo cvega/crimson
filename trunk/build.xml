@@ -1,10 +1,12 @@
 <?xml version="1.0"?> 
+<!DOCTYPE project PUBLIC "-//ANT//DTD project//EN" "project.dtd">
 
 <!--
 This is an ant build file compatible with ant version 1.3.
 
 Useful targets:
-    + jars jar  the default target to make jar files
+    + jars jar  the default target to make jar files for development
+    + docs      builds all docs into ${dist.dir}
     + dist      creates a crimson-[version].zip file
     + clean     deletes all generated files
 
@@ -17,8 +19,12 @@ peer of this module.
 <project name="crimson" default="jars" basedir=".">
 
   <!-- Use this property to set version of crimson -->
+  <property name="jaxp.spec.version" value="1.1" />
   <property name="impl.version" value="1.1.2beta2" />
-  <property name="name" value="crimson"/>
+
+  <!-- The name of a sibling xml-commons tree which is used to build a
+        crimson distribution -->
+  <property name="xml-commons.name" value="xml-commons"/>
 
   <!-- Build options -->
   <property name="optimize" value="false" />
@@ -27,32 +33,106 @@ peer of this module.
   <!-- The name "build" refers to a directory without a version number,
        while the name "dist" refers to a directory with a version number
        that can be zipped or tarred.  Unzipping such a zip file will create
-       a directory neatly containing everything in the distribution.  -->
+       a directory neatly containing everything in a distribution.
+
+       General policy: Property names use "." as separators as typical Java
+       properties do.  Attribute names use "-" as separators.
+  -->
 
   <property name="build.dir" value="build" />
   <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="build.api.src" value="${build.dir}/src"/>
 
-  <property name="dist.file" value="${name}-${impl.version}" />
+  <property name="dist.file" value="crimson-${impl.version}" />
   <property name="dist.dir" value="${build.dir}/${dist.file}"/>
+  <property name="distbin.dir" value="${dist.dir}"/>
+  <property name="distsrc.dir" value="${dist.dir}"/>
 
   <!-- Points to tree containing common XML APIs shared between various
-       Apache XML projects.  The base directory contains the build.xml file
-       used to build the common api jar file. -->
-  <property name="api.base.dir" value="../xml-commons/java/external"/>
-  <property name="api.build.dir" value="${api.base.dir}/build"/>
-  <property name="api.jar.name" value="xml-apis.jar"/>
-<!-- XXX This task does not work with Ant 1.3 for some unknown reason
-  <available file="${api.base.dir}/build.xml" property="api.base.dir.present"/>
--->
+       Apache XML projects.  The base directory refers to the sub directory
+       that contains the build.xml file that once was used to build the
+       common api jar file. -->
+  <property name="xml-commons.basedir"
+    value="../${xml-commons.name}/java/external"/>
 
-  <target name="prepare" >
+  <!-- Patternset to specify which java files belong to the API -->
+  <patternset id="api-patternset">
+    <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
+    <include name="org/xml/sax/**"/>
+    <include name="javax/xml/parsers/**"/>
+    <!-- Omit TraX
+      <include name="javax/xml/transform/**"/>
+    -->
+  </patternset>
+
+  <property name="api.jar.name" value="jaxp.jar"/>
+
+  <target name="init">
+    <antstructure output="project.dtd"/>
+
+    <available file="${xml-commons.basedir}/build.xml"
+      property="xml-commons.present"/>
+    <echo message="xml-commons.present is ${xml-commons.present}"/>
+
+    <tstamp>
+      <format pattern="yyyy-MM-dd" property="TODAY-ISO"/>
+    </tstamp>
+    <filter token="today-iso" value="${TODAY-ISO}"/>
+    <filter token="version" value="${impl.version}"/>
+  </target>
+
+  <target name="prepare" depends="init">
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${build.classes}"/>
   </target>
 
   <!-- ==================== Build  ==================== -->
 
-  <target name="compile" depends="prepare">
+<!--
+  <target name="api.basedir" unless="api.basedir.present" depends="init">
+    <fail message="The xml-commons module must be a sibling of this one."/>
+  </target>
+-->
+
+  <target name="copy-api-src-from-xml-commons" if="xml-commons.present"
+    depends="init">
+    <echo>Copying API src from ${xml-commons.basedir}</echo>
+    <copy todir="${build.api.src}" includeemptydirs="no">
+      <fileset dir="${xml-commons.basedir}/src">
+        <patternset refid="api-patternset"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="copy-api-src-from-local" unless="xml-commons.present"
+    depends="init">
+    <echo>Copying API src from local tree</echo>
+    <copy todir="${build.api.src}" includeemptydirs="no">
+      <fileset dir="src">
+        <patternset refid="api-patternset"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="copy-api-src"
+    depends="copy-api-src-from-xml-commons,copy-api-src-from-local"/>
+
+  <target name="compile-api" depends="prepare,copy-api-src">
+    <javac destdir="${build.classes}"
+           debug="${debug}"
+           optimize="${optimize}"
+           deprecation="off">
+      <classpath>
+        <pathelement location="${build.classes}"/>
+      </classpath>
+      <src location="${build.api.src}"/>
+      <patternset refid="api-patternset"/>
+    </javac>
+  </target>
+
+  <!-- XXX Here I am -->
+  <!-- Compile parser implementation classes -->
+  <target name="compile-impl" depends="prepare">
     <javac srcdir="src" 
            destdir="${build.classes}"
            debug="${debug}"
@@ -67,8 +147,7 @@ peer of this module.
       <exclude name="**/SCCS/**" />
       <include name="org/apache/**" />
     </javac>
-    <copy 
-      todir="${build.classes}/org/apache" >
+    <copy todir="${build.classes}/org/apache">
       <fileset dir="src/org/apache" >
         <include name="**/**.properties" />
         <exclude name="**/,**" />
@@ -77,16 +156,18 @@ peer of this module.
     </copy>
   </target>
 
-  <target name="api.base.dir" unless="api.base.dir.present">
-    <echo message="The xml-commons module must be a sibling of this one."/>
+  <!-- This target was used to create a separate JAXP API jar which
+        contained only the javax.xml.parsers and javax.xml.transform.*
+        packages. -->
+  <target name="api-jar" depends="compile-api">
+    <jar jarfile="${build.dir}/${api.jar.name}"
+         basedir="${build.classes}"
+         manifest="src/META-INF/jaxp-javax.manifest" >
+      <include name="javax/xml/**"/>
+    </jar>
   </target>
 
-  <target name="api.jar" depends="api.base.dir">
-    <ant dir="${api.base.dir}" target="jar"/>
-    <copy file="${api.build.dir}/${api.jar.name}" todir="${build.dir}" />
-  </target>
-
-  <target name="crimson.jar" depends="api.jar,compile">
+  <target name="crimson.jar" depends="compile-api,compile-impl">
     <mkdir dir="${build.classes}/META-INF/services" />
     <copy todir="${build.classes}/META-INF/services">
       <fileset dir="src/META-INF/services">
@@ -99,27 +180,62 @@ peer of this module.
          manifest="src/META-INF/manifest.crimson" >
       <include name="META-INF/services/**" />
       <include name="org/apache/crimson/**" />
+      <include name="org/w3c/dom/*"/>
+      <include name="org/xml/sax/**"/>
     </jar>
   </target>
 
-  <target name="javadoc" depends="api.base.dir">
-    <ant dir="${api.base.dir}" target="javadoc">
-    </ant>
-    <mkdir dir="${build.dir}/docs/javadoc"/>
-    <copy todir="${build.dir}/docs/javadoc">
-      <fileset dir="${api.build.dir}/docs/javadoc">
-      </fileset>
+<!-- XXX fix dependencies! -->
+  <target name="jars" depends="">
+  </target>
+<!--
+  <target name="jars" depends="api.jar,crimson.jar">
+  </target>
+-->
+
+  <target name="jar" depends="jars">
+  </target>
+
+<!-- XXX fix dependencies! -->
+  <target name="javadoc" depends="">
+    <mkdir dir="${build.dir}/docs/api"/>
+    <javadoc packagenames="org.w3c.dom,org.xml.*,javax.xml.*"
+             destdir="${build.dir}/docs/api"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="Java API for XML Processing Specification ${jaxp.spec.version}"
+             doctitle="Java API for XML Processing Specification ${jaxp.spec.version}">
+      <sourcepath refid="src.path"/>
+    </javadoc>
+  </target>
+
+  <target name="examples" depends="init">
+    <mkdir dir="${build.dir}/examples"/>
+    <copy todir="${build.dir}/examples">
+      <fileset dir="examples"/>
     </copy>
   </target>
 
-  <target name="other.doc">
-    <copy file="docs/README.txt" todir="${dist.dir}" />
-    <copy file="ChangeLog" todir="${dist.dir}" />
+  <target name="non-javadoc" depends="init">
+    <mkdir dir="${build.dir}/docs"/>
+    <copy todir="${build.dir}/docs">
+      <fileset dir="docs">
+        <exclude name="README.html"/>
+        <exclude name="README.txt"/>
+      </fileset>
+    </copy>
+    <copy todir="${build.dir}" file="docs/README.html" filtering="true"/>
+    <copy file="ChangeLog" todir="${build.dir}"/>
   </target>
 
-  <target name="dist" depends="jars,javadoc,other.doc,api.base.dir" >
-    <!-- Copy the jar files -->
-    <copy file="${build.dir}/${name}.jar" todir="${dist.dir}" />
+  <target name="docs" depends="non-javadoc,examples,javadoc">
+  </target>
+
+<!-- XXX fix dependencies! -->
+  <target name="dist" depends="jars,docs," >
+    <!-- Copy the built jar files -->
+    <copy file="${build.dir}/crimson.jar" todir="${dist.dir}" />
     <copy file="${build.dir}/${api.jar.name}" todir="${dist.dir}" />
 
     <!-- Copy sources -->
@@ -128,17 +244,11 @@ peer of this module.
       <fileset dir="src"/>
 
       <!-- XML API src files -->
-      <fileset dir="${api.base.dir}/src"/>
-    </copy>
-
-    <!-- Copy built documentation and javadoc -->
-    <copy todir="${dist.dir}/docs">
-      <fileset dir="${build.dir}/docs"/>
-    </copy>
-
-    <!-- Copy examples -->
-    <copy todir="${dist.dir}/examples">
-      <fileset dir="examples"/>
+      <fileset dir="${api.basedir}/src">
+        <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
+        <include name="org/xml/sax/**"/>
+        <include name="javax/xml/**"/>
+      </fileset>
     </copy>
 
     <zip zipfile="${build.dir}/${dist.file}.zip"
@@ -146,21 +256,46 @@ peer of this module.
          includes="${dist.file}/**" />
   </target>
 
-  <target name="jars" depends="api.jar,crimson.jar">
-  </target>
+<!-- XXX fix dependencies! -->
+  <target name="pack-src" depends="init," >
+    <echo message="Building the source distribution"/>
+    <delete dir="${distsrc.dir}"/>
 
-  <target name="jar" depends="jars">
-  </target>
+    <mkdir dir="${distsrc.dir}"/>
+    <mkdir dir="${distsrc.dir}/src"/>
 
-  <target name="all" depends="jars">
-  </target>
+    <!-- Copy sources -->
+    <copy todir="${distsrc.dir}/src" includeemptydirs="no">
+      <!-- Parser implementation src files -->
+      <fileset dir="src"/>
 
-  <target name="main" depends="prepare,all,dist">
+      <!-- XML API src files -->
+      <fileset dir="${api.basedir}/src">
+        <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
+        <include name="org/xml/sax/**"/>
+        <include name="javax/xml/**"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${distsrc.dir}/docs">
+      <fileset dir="docs"/>
+    </copy>
+
+    <copy todir="${distsrc.dir}/examples">
+      <fileset dir="examples"/>
+    </copy>
+
+    <copy file="README.txt" todir="${distsrc.dir}"/>
+    <copy file="build.xml" todir="${distsrc.dir}"/>
+    <copy file="ChangeLog" todir="${distsrc.dir}"/>
+    <copy file="project.dtd" todir="${distsrc.dir}"/>
+
+    <zip zipfile="${build.dir}/${dist.file}.zip"
+         basedir="${build.dir}"
+         includes="${dist.file}/**" />
   </target>
 
   <target name="clean">
     <delete dir="${build.dir}"/>
-    <ant dir="${api.base.dir}" target="clean"/>
   </target>
-  
 </project>

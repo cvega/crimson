@@ -105,8 +105,9 @@ do not display in your browser.<ul>
       an XML file and generate a DOM Document object from it. Use the <a
       href="DOMEcho/DOMEcho.java">DOMEcho example</a> to learn how to do
       this in three steps.  The important lines are:</p><pre>
-        // Step 1: create a DocumentBuilderFactory
+        // Step 1: create a DocumentBuilderFactory and setNamespaceAware
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
 
         // Step 2: create a DocumentBuilder
         DocumentBuilder db = dbf.newDocumentBuilder();

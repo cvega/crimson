@@ -174,7 +174,7 @@ public class SAXParserImpl extends SAXParser {
     public void setProperty(String name, Object value)
         throws SAXNotRecognizedException, SAXNotSupportedException
     {
-        throw new SAXNotRecognizedException("Feature: " + name);
+        xmlReader.setProperty(name, value);
     }
 
     /**
@@ -184,7 +184,7 @@ public class SAXParserImpl extends SAXParser {
     public Object getProperty(String name)
         throws SAXNotRecognizedException, SAXNotSupportedException
     {
-        throw new SAXNotRecognizedException("Feature: " + name);
+        return xmlReader.getProperty(name);
     }
 
 

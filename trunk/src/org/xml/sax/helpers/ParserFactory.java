@@ -121,7 +121,10 @@ public class ParserFactory {
 	InstantiationException,
 	ClassCastException
     {
-	return (Parser)(Class.forName(className).newInstance());
+        // Original SAX code
+	// return (Parser)(Class.forName(className).newInstance());
+
+        return (Parser) NewInstance.newInstance(className);
     }
     
 }

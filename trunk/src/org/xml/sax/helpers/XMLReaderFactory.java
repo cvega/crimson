@@ -113,7 +113,10 @@ final public class XMLReaderFactory
 	throws SAXException
     {
 	try {
-	    return (XMLReader)(Class.forName(className).newInstance());
+            // Original SAX code
+	    // return (XMLReader)(Class.forName(className).newInstance());
+
+            return (XMLReader) NewInstance.newInstance(className);
 	} catch (ClassNotFoundException e1) {
 	    throw new SAXException("SAX2 driver class " + className +
 				   " not found", e1);

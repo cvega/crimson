@@ -1447,9 +1447,6 @@ public class Parser2
         // OK, finally report the event.
         if (namespaces) {
             String[] parts = processName(name.name, false);
-            System.out.println("name.name= " + name.name);
-            System.out.println("parts: " + parts[0] + " "
-                               + parts[1] + " " + parts[2]);
             contentHandler.startElement(parts[0], parts[1], parts[2], attTmp);
         } else {
             contentHandler.startElement("", "", name.name, attTmp);

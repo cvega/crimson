@@ -347,16 +347,21 @@ class AttributeSet implements NamedNodeMap, XmlWritable
                 list.removeElementAt(i);
 
                 AttributeNode attr = (AttributeNode)value;
+
+                // Replace with Attr node of default value if it has one
                 String defaultValue = attr.getDefaultValue();
                 if (defaultValue != null) {
-                    // Replace with Attr node of default value
                     AttributeNode newAttr = attr.cloneAttributeNode(true);
                     newAttr.setOwnerElement(attr.getOwnerElement());
                     newAttr.setValue(defaultValue);
                     newAttr.setSpecified(false);
                     list.addElement(newAttr);
                 }
-                return value;
+
+                // Set the ownerElement of attr to null since we're
+                // removing it
+                attr.setOwnerElement(null);
+                return attr;
             }
         }
         throw new DomEx(DomEx.NOT_FOUND_ERR);
@@ -389,16 +394,21 @@ class AttributeSet implements NamedNodeMap, XmlWritable
                     list.removeElementAt(i);
 
                     AttributeNode attr = (AttributeNode)value;
+
+                    // Replace with Attr node of default value if it has one
                     String defaultValue = attr.getDefaultValue();
                     if (defaultValue != null) {
-                        // Replace with new Attr node of default value
                         AttributeNode newAttr = attr.cloneAttributeNode(true);
                         newAttr.setOwnerElement(attr.getOwnerElement());
                         newAttr.setValue(defaultValue);
                         newAttr.setSpecified(false);
                         list.addElement(newAttr);
                     }
-                    return value;
+
+                    // Set the ownerElement of attr to null since we're
+                    // removing it
+                    attr.setOwnerElement(null);
+                    return attr;
                 }
             }
         }

@@ -1157,6 +1157,13 @@ public class Parser2
 
         // params are no good to anyone starting now -- bye!
         params.clear ();
+
+        // Done processing DTD so we will never be expanding any more PE
+        // refs.  This fixes bug where doc containing internal subset
+        // containing a EntityDecl causes incorrect attribute processing
+        // outside the DTD.
+        doLexicalPE = false;
+
         lexicalHandler.endDTD();
 
         // make sure notations mentioned in attributes

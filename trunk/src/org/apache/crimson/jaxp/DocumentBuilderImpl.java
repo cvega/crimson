@@ -114,7 +114,7 @@ public class DocumentBuilderImpl extends DocumentBuilder {
             // validation errors with a warning telling the user to set an
             // ErrorHandler
             if (validating) {
-                xmlReader.setErrorHandler(new DefaultValidationErrorHandler());
+                setErrorHandler(new DefaultValidationErrorHandler());
             }
 
             // Namespace related features needed for XmlDocumentBuilder
@@ -193,6 +193,8 @@ public class DocumentBuilderImpl extends DocumentBuilder {
     }
 
     public void setErrorHandler(org.xml.sax.ErrorHandler eh) {
-        this.eh = eh; 
+        // If app passes in a ErrorHandler of null, then ignore all errors
+        // and warnings
+        this.eh = (eh == null) ? new DefaultHandler() : eh;
     }
 }

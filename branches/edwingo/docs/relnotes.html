@@ -1,0 +1,251 @@
+<HTML><HEAD>
+    <!-- $Id$ 
+    
+    -->
+    <TITLE>
+        Java API for XML Processing -- Release Notes
+    </TITLE>
+    <STYLE>
+    <!--
+        BODY {
+            font-family:        Lucida, Helvetica, Univers, sans-serif;
+        }
+        H1, H2, H3, H4, H5, H6 {
+            text-align:         center;
+            color:              maroon;
+        }
+        CODE {
+            font-family:        Courier, monospace;
+        }
+    -->
+    </STYLE>
+</HEAD>
+  <BODY BGCOLOR="#eeeeff">
+
+
+<H1>
+Java API for XML Processing<br>
+Release Notes
+</H1>
+<center>
+<b>Version:</b> 1.1ea<br>
+</center>
+
+<P>
+This document contains notes that may help you use this library
+more effectively.
+
+<P>
+<!--
+Please feel free to send problem reports,
+questions, and other feedback to the feedback alias,
+<a href="mailto:xml-feedback@java.sun.com">
+&lt;xml-feedback@java.sun.com&gt;</a>.
+With respect to new feature requests, please keep in mind that we
+want to see packages built on top of this core for most features.
+The core API is intended to facilitate a layered architecture
+for value-added products that leverage XML.
+-->
+
+<!--
+<H4> Conformance </H4>
+
+<UL>
+    <LI> The parsers conform to the W3C's
+    <a href=http://www.w3.org/TR/1998/REC-xml-19980210>XML 1.0</a>
+    recommendation.  Sun has done extensive testing to ensure that
+    they conform as closely as possible to this recommendation.
+
+    <LI> The parser supports the <a href=http://java.sun.com/xml>JAXP
+    1.0</a> pluggability API.
+
+    <LI> The parse tree supports the XML (core) part of W3C's
+    <a href=http://www.w3.org/TR/REC-DOM-Level-1/>DOM Level 1</a>
+    recommendation.
+
+    <LI> In combination, the two also support the current W3C
+    <a href=http://www.w3.org/TR/REC-xml-names/>XML Namespaces</a>
+    recommendation.
+
+    <LI> The parser supports the <a href=http://www.megginson.com/SAX>SAX
+    1.0</a> API.  Sun has done extensive testing to ensure that it conforms
+    as closely as possible to this API.
+
+    <LI> The entity resolution used within the parser normally
+    conforms to the IETF's RFC 2376 registration for XML-related
+    MIME content types.  This can be overridden as required.
+    (See below; overriding may be necessary because many web servers do
+    not conform to that specification, and report incorrect character
+    set encoding information.)
+
+    <LI> This parser supports all of the character encodings supported
+    by the Java platform with which it is used.  See the package
+    overview for the <em>com.sun.xml.parser</em> package for more
+    detailed information, including names of specific encodings that
+    are widely used.
+
+    <LI> When used in a supported configuration (JDK 1.1.8 and later),
+    this software is Y2K compliant; it has no date related content.
+
+    </UL>
+-->
+    <h4> XSLT Support </h4>
+    <ul>
+      <li><a href="http://www.w3.org/TR/1999/REC-xslt-19991116">XSLT</a> is
+	supported in this release via the
+	<a href="docs/api/javax/xml/transform/TransformFactory.html">
+	<code>javax.xml.transform.TransformFactory</code></a> class.  See
+	the associated Javadoc for details on accessing basic functionality
+	in a XSLT processor independent manner. </li>
+    </ul>
+
+<H4> Parser </H4>
+
+    <ul>
+      <li> There are two factory classes for making parsers pluggable. If
+	you write to the JAXP API in the
+	<a href="docs/api/javax/xml/parsers/package-summary.html">
+	<code>javax.xml.parsers</code></a>,
+	<a href="docs/api/org/xml/sax/package-summary.html">
+	<code>org.xml.sax</code></a>, and
+	<a href="docs/api/org/w3c/dom/package-summary.html">
+	<code>org.w3c.dom</code></a> packages,
+	you can use the library in a manner independent of the underlying
+	implementing parser.</li>
+
+      <li> To be notified of validation errors in an XML document, two
+	things must happen.<ol>
+	  <li>Validation must be turned on.  See the
+	  <code>setValidating</code> methods of
+	    <a href="docs/api/javax/xml/parsers/DocumentBuilderFactory.html#setValidating(boolean)">
+	      <code>javax.xml.parsers.DocumentBuilderFactory</code></a> or
+	    <a href="docs/api/javax/xml/parsers/SAXParserFactory.html#setValidating(boolean)">
+	      <code>javax.xml.parsers.SAXParserFactory</code>
+	      </a>.
+	  </li>
+	  <li>An application-defined <code>ErrorHandler</code> must be
+	    set.  See the <code>setErrorHandler</code> methods of
+	    <a href="docs/api/javax/xml/parsers/DocumentBuilder.html#setErrorHandler(org.xml.sax.ErrorHandler)">
+	    <code>javax.xml.parsers.DocumentBuilder</code></a> or
+	    <a href="docs/api/org/xml/sax/XMLReader.html#setErrorHandler(org.xml.sax.ErrorHandler)">
+	    <code>org.xml.sax.XMLReader</code></a>.
+	  </li>
+	</ol> The links provided above are only some of the ways to get
+	notification of validation errors.
+
+<!--
+    <LI> Please let us know about any diagnostics produced by the
+    parser that are misleading or confusing.
+-->
+
+    <LI> Whenever you work with text encodings other than UTF-8 and
+    UTF-16, you should put an encoding declaration at the very beginning of
+    all your XML files (including DTDs).  If you don't do this, the
+    parser will not be able to determine the encoding being used, and
+    will probably be unable to parse your document.  A text declaration
+    like <code>&lt;?xml version='1.0' encoding='euc-jp'?&gt;</code> says
+    that the document uses the "euc-jp" encoding.
+
+    <LI> The parser currently reports warnings, rather than errors,
+    in cases where the declared and actual text encodings don't match.
+    It may give those same warnings in the common case where the encoding
+    name used internally to Java is not the one used in the document.
+    If the declared encoding is truly an error, you'll usually see other
+    errors (not warnings) being reported by the parser.
+    
+    <LI> The parser currently does not report an error for content
+    models which are not deterministic.  Accordingly it may not behave
+    well when given data which matches an "ambiguous" content model
+    such as <em>((a,b)|(a,c))</em>.  DTDs with such models are in
+    error, and must be restructured to be unambiguous.  (In the example,
+    <em>(a,(b|c))</em> is an equivalent legal content model.)
+
+    <LI> If you are using JDK 1.1 with large numbers of symbols
+    (more than can be counted in sixteen bits) you might encounter
+    a message, <em>panic: 16-bit string hash table overflow</em>
+    as the Java VM aborts.  The Java 2 SDK does not have this limitation.
+
+
+</UL>
+
+<H4> Object Model </H4>
+
+<UL>
+
+    <LI> Conforming to the XML specification, the parser reports all
+    whitespace to the DOM even, if it's meaningless.  Many applications
+    do not want to see such whitespace.  You can remove it by invoking
+    the <em>Element.normalize</em> method, which merges adjacent text
+    nodes and also canonicalizes adjacent whitespace into a single space
+    (unless the <em>xml:space="preserve"</em> attribute prevents it).
+
+    <LI> Currently, attribute nodes may not have children.  Access their
+    values as strings instead of enumerating children.
+
+
+    <LI> Currently, when documents are cloned, the clone will not have a
+    clone of the associated ElementFactory or DocumentType.
+
+    <LI> The in-memory representation of text nodes has not been tuned
+    to be efficient with respect to space utilization.
+
+</UL>
+
+<H4> Other Issues </H4>
+
+<UL>
+
+    <LI> This software is a "Java Optional Package" for
+    XML processing.
+
+    <LI> If you recompile the DOM implementation using versions of "javac"
+    older than the Java 2 SDK version 1.2 you may run into a compiler bug.
+    The symptom is a report of illegal access violations for some of the
+    private classes inside the DOM implementation.  This is because of
+    incorrect code generated by the compiler.  You should only compile
+    these class files with a compiler that does not have this bug; you may
+    also use the pre-compiled version in this release.  There is no
+    bytecode dependency on the Java 2 runtime; you may use these classes on
+    JDK 1.1 systems also.
+
+    <LI> The Microsoft SDK 3.2 for Java (and presumably all earlier
+    versions) has bugs similar to the one noted above.  There are
+    both compiler and JVM bugs; the JVM bugs prevent the correct
+    byte codes (as produced by the Java 2 SDK) from working.  This
+    means that you can't compile or use this DOM code with Microsoft
+    implementations of Java until Microsoft fixes these bugs, which
+    have been reported to Microsoft.
+
+</UL>
+
+<h4> Changes since JAXP RI (Reference Implementation) version 1.0.1 </h4>
+    <ul>
+      <li>All previous releases (from version 1.0.1 and before) used a
+	parser implementation with a package heirarchy beginning with
+	<code>com.sun.xml</code>.  Between version 1.0.1 and the current
+	release, the parser was donated to the Apache Software Foundation
+	under the name "Crimson" and the packages were correspondingly
+	renamed to <code>org.apache.crimson</code>.  Migration from
+	previous releases may involve renaming packages in your
+	application.  In addition, if your application uses SAX1 then you
+	may either convert it to use the preferred SAX2
+	<code>org.sax.xml.XMLReader</code> or obtain a SAX1
+	<code>org.sax.xml.Parser</code> from the
+	<code>javax.xml.parsers.SAXParser.getParser()</code> method.
+      </li>
+    </ul>
+<!--
+<H4> Changes since EA1 </H4>
+
+<UL>
+
+    <LI> API for pluggability has changed. See the specification and
+    javadocs for more details.
+
+    <LI> All the reported bugs have been fixed including those reported
+    internally for SAX 1.0 DOM Level 1 and the JAXP 1.0 API.
+
+</UL>
+-->
+
+</BODY></HTML>

@@ -100,11 +100,11 @@ public class DomImpl implements DOMImplementation
      */
     public DocumentType createDocumentType(String qualifiedName,
                                            String publicId,
-                                           String systemId,
-                                           String internalSubset)
+                                           String systemId)
+                                         /*  String internalSubset) */
     {
         // Note that DOM2 specifies that ownerDocument = null
-        return new Doctype(qualifiedName, publicId, systemId, internalSubset);
+        return new Doctype(qualifiedName, publicId, systemId/*, internalSubset*/);
     }
 
     /**

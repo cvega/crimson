@@ -163,6 +163,7 @@ public class TreeWalker
 	  case Node.COMMENT_NODE:
 	  case Node.DOCUMENT_TYPE_NODE:
 	  case Node.ENTITY_NODE:
+	  case Node.NOTATION_NODE:
 	  case Node.PROCESSING_INSTRUCTION_NODE:
 	  case Node.TEXT_NODE:
 	    //

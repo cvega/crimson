@@ -166,6 +166,10 @@ class AttributeNode extends NamespacedNode implements Attr
             if (!XmlNames.isUnqualifiedName(qualifiedName)) {
                 throw new DomEx(DomEx.INVALID_CHARACTER_ERR);
             }
+            if ("xmlns".equals(qualifiedName) &&
+                !namespaceURI.equals(SPEC_XMLNS_URI)) {
+                throw new DomEx(DomEx.NAMESPACE_ERR);
+            }
             return;
         }
 
@@ -185,10 +189,7 @@ class AttributeNode extends NamespacedNode implements Attr
 
         // If we get here then we must have a valid prefix
         if (namespaceURI == null
-            || "".equals(namespaceURI)
-            || ("xml".equals(prefix) && !namespaceURI.equals(SPEC_XML_URI))
-            || ("xmlns".equals(prefix) &&
-                !namespaceURI.equals(SPEC_XMLNS_URI))) {
+            || ("xml".equals(prefix) && !namespaceURI.equals(SPEC_XML_URI))) {
             throw new DomEx(DomEx.NAMESPACE_ERR);
         }
     }

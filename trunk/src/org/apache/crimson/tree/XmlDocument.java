@@ -1254,8 +1254,8 @@ public class XmlDocument extends ParentNode implements DocumentEx
         case DOCUMENT_TYPE_NODE:
             throw new DomEx(DomEx.NOT_SUPPORTED_ERR);
         case ELEMENT_NODE:
-            // XXX Fix copying of defaulted attributes
-            node = importedNode.cloneNode(deep);
+            node = ((ElementNode2) importedNode).createCopyForImportNode(
+                deep, this);
             break;
         case ENTITY_NODE:
             node = importedNode.cloneNode(deep);

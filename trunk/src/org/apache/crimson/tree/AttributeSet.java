@@ -125,6 +125,32 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     }
 
     /**
+     * Constructor used to implement Document.importNode().  Only
+     * "specified" Attr nodes are copied.  Copy is always deep.
+     */
+    AttributeSet(AttributeSet original) {
+        int size = original.getLength();
+        list = new Vector(size);
+
+        for (int i = 0; i < size; i++) {
+            Node node = original.item(i);
+
+            if (!(node instanceof AttributeNode)) {
+                throw new IllegalArgumentException(((NodeBase)node).
+                                                   getMessage ("A-003"));
+            }
+
+            AttributeNode attr = (AttributeNode) node;
+            // Copy only specified attributes
+            if (attr.getSpecified()) {
+                node = attr.cloneAttributeNode(true);
+                list.addElement(node);
+            }
+        }
+        list.trimToSize();
+    }
+
+    /**
      * Create a DOM NamedNodeMap consisting of DOM Level 2 Attr nodes from
      * a SAX2 Attributes object
      */

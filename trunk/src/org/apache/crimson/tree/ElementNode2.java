@@ -70,7 +70,9 @@ import org.w3c.dom.*;
 
 
 /**
- * Modified version of ElementNode to support DOM Level 2 methods.
+ * Modified version of ElementNode to support DOM Level 2 methods.  This
+ * class is named ElementNode2 for backward compatibility since old DOM
+ * Level 1 apps may have subclassed ElementNode.
  * 
  * This class represents XML elements in a parse tree, and is often
  * subclassed to add custom behaviors.  When an XML Document object
@@ -117,7 +119,9 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         super(namespaceURI, qName);
     }
 
-    // Used for cloneNode()
+    /**
+     * Constructor used for cloneNode()
+     */
     private ElementNode2(ElementNode2 original) {
         super(original.namespaceURI, original.qName);
         if (original.attributes != null) {
@@ -127,6 +131,42 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         idAttributeName = original.idAttributeName;
         userObject = original.userObject;
         ownerDocument = original.ownerDocument;
+    }
+
+    /**
+     * @return New ElementNode2 which is a copy of "this" but without
+     * attributes that are defaulted in the original document.
+     *
+     * Used to implement Document.importNode().
+     */
+    ElementNode2 createCopyForImportNode(boolean deep,
+                                         XmlDocument newOwnerDocument)
+    {
+        ElementNode2 retval = new ElementNode2(namespaceURI, qName);
+        if (attributes != null) {
+            // Copy only "specified" Attr-s
+            retval.attributes = new AttributeSet(attributes);
+            retval.attributes.setOwnerElement(retval);
+        }
+        retval.userObject = userObject;
+        retval.ownerDocument = newOwnerDocument;
+
+        if (deep) {
+            for (int i = 0; true; i++) {
+                Node node = item(i);
+                if (node == null) {
+                    break;
+                }
+                if (node instanceof ElementNode2) {
+                    retval.appendChild(
+                        ((ElementNode2) node).createCopyForImportNode(
+                            true, newOwnerDocument));
+                } else {
+                    retval.appendChild(node.cloneNode(true));
+                }
+            }
+        }
+        return retval;
     }
 
     static void checkArguments(String namespaceURI, String qualifiedName)
@@ -529,7 +569,6 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
 	return attr;
     }
 
-    
     /**
      * Creates a new unparented node whose attributes are the same as
      * this node's attributes; if <em>deep</em> is true, the children

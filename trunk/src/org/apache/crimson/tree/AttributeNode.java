@@ -312,8 +312,10 @@ class AttributeNode extends NamespacedNode implements Attr
      */
     AttributeNode cloneAttributeNode(boolean deep) {
         try {
+            // XXX should probably use Java Cloneable scheme instead
             AttributeNode attr =
-                new AttributeNode(name, value, specified, defaultValue);
+                new AttributeNode(namespaceURI, name, value, specified,
+                                  defaultValue);
             attr.setOwnerDocument((XmlDocument)getOwnerDocument());
             if (deep) {
                 Node node;

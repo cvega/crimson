@@ -57,6 +57,7 @@
 package org.apache.crimson.tree;
 
 import org.w3c.dom.*;
+import org.apache.crimson.util.XmlNames;
 
 /**
  * This class implements the DOM <em>DOMImplementation</em> interface.
@@ -108,6 +109,13 @@ public class DOMImplementationImpl implements DOMImplementation
                                            String publicId,
                                            String systemId)
     {
+        if (!XmlNames.isName(qualifiedName)) {
+            throw new DomEx(DOMException.INVALID_CHARACTER_ERR);
+        }
+        if (!XmlNames.isQualifiedName(qualifiedName)) {
+            throw new DomEx(DOMException.NAMESPACE_ERR);
+        }
+
         // Note that DOM2 specifies that ownerDocument = null
         return new Doctype(qualifiedName, publicId, systemId,
                            /* internalSubset */ null);

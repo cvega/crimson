@@ -291,7 +291,7 @@ public class AttributeNode extends NamespacedNode implements Attr
 
     /**
      * Clone this AttributeNode and possibly its children (which cannot be
-     * AttributeNodes themselves).
+     * AttributeNodes themselves).  "ownerElement" will remain null.
      */
     AttributeNode cloneAttributeNode(boolean deep) {
         try {

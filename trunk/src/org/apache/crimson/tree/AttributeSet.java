@@ -303,10 +303,12 @@ class AttributeSet implements NamedNodeMap, XmlWritable
         for (int i = 0; i < list.size(); i++) {
             Node value = item(i);
             String iLocalName = value.getLocalName();
-            if (iLocalName != null && iLocalName.equals(localName)) {
+            // assert(iLocalName != null);
+            if (iLocalName.equals(localName)) {
                 String iNamespaceURI = value.getNamespaceURI();
-                if (iNamespaceURI != null
-                    && iNamespaceURI.equals(namespaceURI)) {
+                if (iNamespaceURI == namespaceURI ||
+                    (iNamespaceURI != null
+                     && iNamespaceURI.equals(namespaceURI))) {
                     return value;
                 }
             }
@@ -335,17 +337,19 @@ class AttributeSet implements NamedNodeMap, XmlWritable
         for (int i = 0; i < list.size(); i++) {
             Node value = (Node)list.elementAt(i);
             if (value.getNodeName().equals(name)) {
-                AttributeNode att = (AttributeNode)value;
+                // Found a match
+                list.removeElementAt(i);
 
-                String defaultValue = att.getDefaultValue();
+                AttributeNode attr = (AttributeNode)value;
+                String defaultValue = attr.getDefaultValue();
                 if (defaultValue != null) {
                     // Replace with Attr node of default value
-                    att.setValue(defaultValue);
-                    att.setSpecified(false);
-                } else {
-                    list.removeElementAt(i);
+                    AttributeNode newAttr = attr.cloneAttributeNode(true);
+                    newAttr.setOwnerElement(attr.getOwnerElement());
+                    newAttr.setValue(defaultValue);
+                    newAttr.setSpecified(false);
+                    list.addElement(newAttr);
                 }
-
                 return value;
             }
         }
@@ -365,18 +369,24 @@ class AttributeSet implements NamedNodeMap, XmlWritable
         for (int i = 0; i < list.size(); i++) {
             Node value = (Node)list.elementAt(i);
             String iLocalName = value.getLocalName();
-            if (iLocalName != null && iLocalName.equals(localName)) {
+            // assert(iLocalName != null);
+            if (iLocalName.equals(localName)) {
                 String iNamespaceURI = value.getNamespaceURI();
-                if (iNamespaceURI != null
-                    && iNamespaceURI.equals(namespaceURI)) {
+                if (iNamespaceURI == namespaceURI ||
+                    (iNamespaceURI != null
+                     && iNamespaceURI.equals(namespaceURI))) {
+                    // Found a match
+                    list.removeElementAt(i);
+
                     AttributeNode attr = (AttributeNode)value;
                     String defaultValue = attr.getDefaultValue();
                     if (defaultValue != null) {
-                        // Replace with Attr node of default value
-                        attr.setValue(defaultValue);
-                        attr.setSpecified(false);
-                    } else {
-                        list.removeElementAt(i);
+                        // Replace with new Attr node of default value
+                        AttributeNode newAttr = attr.cloneAttributeNode(true);
+                        newAttr.setOwnerElement(attr.getOwnerElement());
+                        newAttr.setValue(defaultValue);
+                        newAttr.setSpecified(false);
+                        list.addElement(newAttr);
                     }
                     return value;
                 }

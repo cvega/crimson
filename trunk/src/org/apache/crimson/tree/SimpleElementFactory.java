@@ -206,6 +206,12 @@ public class SimpleElementFactory implements ElementFactory
 	    Class	retval;
 
 	    try {
+                if (loader == null) {
+                    // Find the appropriate ClassLoader to use depending on
+                    // if we are part of the JDK or not and taking JDK
+                    // version into account.
+                    loader = findClassLoader();
+                }
 		if (loader == null)
 		    retval = Class.forName (className);
 		else
@@ -316,5 +322,59 @@ public class SimpleElementFactory implements ElementFactory
     //XXX use the default locale only at this point.
     String getMessage (String messageId, Object[] parameters) {
 	return XmlDocument.catalog.getMessage (locale, messageId, parameters);
+    }
+
+
+    /*
+     * The following section of code tries to get our ContextClassLoader,
+     * if we are running in Java 2.  This code is derived from
+     * javax.xml.parsers.FactoryFinder.
+     */
+
+    /**
+     * Figure out which ClassLoader to use.  For JDK 1.2 and later use the
+     * context ClassLoader if possible.  Note: we defer linking the class
+     * that calls an API only in JDK 1.2 until runtime so that we can catch
+     * LinkageError so that this code will run in older non-Sun JVMs such
+     * as the Microsoft JVM in IE.
+     */
+    private static ClassLoader findClassLoader()
+    {
+        ClassLoader classLoader;
+        try {
+            // Construct the name of the concrete class to instantiate
+            Class clazz = Class.forName(SimpleElementFactory.class.getName()
+                                        + "$ClassLoaderFinderConcrete");
+            ClassLoaderFinder clf = (ClassLoaderFinder) clazz.newInstance();
+            classLoader = clf.getContextClassLoader();
+        } catch (LinkageError le) {
+            // Assume that we are running JDK 1.1, use the current ClassLoader
+            classLoader = SimpleElementFactory.class.getClassLoader();
+        } catch (ClassNotFoundException x) {
+            // This case should not normally happen.  MS IE can throw this
+            // instead of a LinkageError the second time Class.forName() is
+            // called so assume that we are running JDK 1.1 and use the
+            // current ClassLoader
+            classLoader = SimpleElementFactory.class.getClassLoader();
+        } catch (Exception x) {
+            // Something abnormal happened so just use current ClassLoader
+            classLoader = SimpleElementFactory.class.getClassLoader();
+        }
+        return classLoader;
+    }
+
+    /*
+     * The following nested classes allow getContextClassLoader() to be
+     * called only on JDK 1.2 and yet run in older JDK 1.1 JVMs
+     */
+
+    private static abstract class ClassLoaderFinder {
+        abstract ClassLoader getContextClassLoader();
+    }
+
+    static class ClassLoaderFinderConcrete extends ClassLoaderFinder {
+        ClassLoader getContextClassLoader() {
+            return Thread.currentThread().getContextClassLoader();
+        }
     }
 }

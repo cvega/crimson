@@ -70,6 +70,17 @@ public class AttributeNode1 extends AttributeNode
     }
 
     /**
+     * Make a clone of this node and return it.  Used for cloneNode().
+     */
+    AttributeNode makeClone() {
+        AttributeNode retval = new AttributeNode1(qName, getValue(),
+                                                  getSpecified(),
+                                                  getDefaultValue());
+        retval.ownerDocument = ownerDocument;
+        return retval;
+    }
+
+    /**
      * The namespace prefix of this node, or <code>null</code> if it is
      * unspecified.
      *

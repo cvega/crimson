@@ -123,11 +123,14 @@ public class AttributeNode extends NamespacedNode implements Attr
         this.defaultValue = defaultValue;
     }
 
-    // Used for cloneNode()
-    private AttributeNode(AttributeNode original) {
-        this(original.namespaceURI, original.qName,
-             original.value, original.specified, original.defaultValue);
-        ownerDocument = original.ownerDocument;
+    /**
+     * Make a clone of this node and return it.  Used for cloneNode().
+     */
+    AttributeNode makeClone() {
+        AttributeNode retval = new AttributeNode(namespaceURI, qName, value,
+                                                 specified, defaultValue);
+        retval.ownerDocument = ownerDocument;
+        return retval;
     }
 
     /**
@@ -295,7 +298,7 @@ public class AttributeNode extends NamespacedNode implements Attr
      */
     AttributeNode cloneAttributeNode(boolean deep) {
         try {
-            AttributeNode attr = new AttributeNode(this);
+            AttributeNode attr = makeClone();
             if (deep) {
                 Node node;
                 for (int i = 0; (node = item (i)) != null; i++) {

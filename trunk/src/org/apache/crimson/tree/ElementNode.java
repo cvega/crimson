@@ -85,6 +85,21 @@ public class ElementNode extends ElementNode2
     }
 
     /**
+     * Make a clone of this node and return it.  Used for cloneNode().
+     */
+    ElementNode2 makeClone() {
+        ElementNode2 retval = new ElementNode(qName);
+        if (attributes != null) {
+            retval.attributes = new AttributeSet(attributes, true);
+            retval.attributes.setOwnerElement(this);
+        }
+        retval.setIdAttributeName(getIdAttributeName());
+        retval.setUserObject(getUserObject());
+        retval.ownerDocument = ownerDocument;
+        return retval;
+    }
+
+    /**
      * Assigns the element's name, when the element has been
      * constructed using the default constructor.  For use by
      * element factories potentially by custom subclasses. 

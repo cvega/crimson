@@ -106,7 +106,7 @@ import org.w3c.dom.*;
  */
 public class ElementNode2 extends NamespacedNode implements ElementEx
 {
-    private AttributeSet	attributes;
+    protected AttributeSet	attributes;
     private String		idAttributeName;
     private Object		userObject;
 
@@ -120,17 +120,18 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
     }
 
     /**
-     * Constructor used for cloneNode()
+     * Make a clone of this node and return it.  Used for cloneNode().
      */
-    private ElementNode2(ElementNode2 original) {
-        super(original.namespaceURI, original.qName);
-        if (original.attributes != null) {
-            attributes = new AttributeSet(original.attributes, true);
-            attributes.setOwnerElement(this);
+    ElementNode2 makeClone() {
+        ElementNode2 retval = new ElementNode2(namespaceURI, qName);
+        if (attributes != null) {
+            retval.attributes = new AttributeSet(attributes, true);
+            retval.attributes.setOwnerElement(retval);
         }
-        idAttributeName = original.idAttributeName;
-        userObject = original.userObject;
-        ownerDocument = original.ownerDocument;
+        retval.idAttributeName = idAttributeName;
+        retval.userObject = userObject;
+        retval.ownerDocument = ownerDocument;
+        return retval;
     }
 
     /**
@@ -570,6 +571,15 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
 	return attr;
     }
 
+//     void printClone(ElementNode2 n) {
+//         System.out.println("n=" + n);
+//         System.out.println("n.od=" + n.getOwnerDocument());
+//         Node n2 = n.attributes.getNamedItem("id");
+//         System.out.println("n2.value=" + n2.getNodeValue());
+//         System.out.println("n2.od=" + n2.getOwnerDocument());
+//         System.out.println("n2.oe=" + ((Attr)n2).getOwnerElement());
+//     }
+
     /**
      * Creates a new unparented node whose attributes are the same as
      * this node's attributes; if <em>deep</em> is true, the children
@@ -578,9 +588,7 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
     public Node cloneNode (boolean deep)
     {
 	try {
-	    ElementNode2 retval;
-
-            retval = new ElementNode2(this);
+	    ElementNode2 retval = makeClone();
 	    if (deep) {
 		for (int i = 0; true; i++) {
 		    Node	node = item (i);

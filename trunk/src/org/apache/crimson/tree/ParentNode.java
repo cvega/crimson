@@ -559,8 +559,14 @@ abstract class ParentNode extends NodeBase
 	    Node	node = null;
 
 	    while (i > lastIndex
-		    && (node = lastWalker.getNextElement (tag)) != null)
+                   && (node = lastWalker.getNextElement (tag)) != null) {
 		lastIndex++;
+            }
+
+            // If we walk off the end of the list, throw away lastWalker
+            if (node == null) {
+                lastWalker = null;
+            }
 	    return node;
 	}
 
@@ -620,6 +626,11 @@ abstract class ParentNode extends NodeBase
                    && (node = lastWalker.getNextElement(namespaceURI,
                                                         tag)) != null) {
 		lastIndex++;
+            }
+
+            // If we walk off the end of the list, throw away lastWalker
+            if (node == null) {
+                lastWalker = null;
             }
 	    return node;
 	}

@@ -41,10 +41,10 @@ All generated files are created under ${build.dir}
 
   <target name="compile" depends="prepare">
     <javac srcdir="src" 
-      destdir="${build.classes}"
-      debug="${debug}"
-      optimize="${optimize}"
-      deprecation="off" >
+           destdir="${build.classes}"
+           debug="${debug}"
+           optimize="${optimize}"
+           deprecation="off" >
       <classpath>
         <pathelement location="${build.classes}" />
         <pathelement location="lib/jaxp.jar" />
@@ -83,8 +83,8 @@ All generated files are created under ${build.dir}
       </fileset>
     </copy>
     <jar jarfile="${build.dir}/crimson.jar"
-      basedir="${build.classes}"
-      manifest="src/META-INF/manifest.crimson" >
+         basedir="${build.classes}"
+         manifest="src/META-INF/manifest.crimson" >
       <include name="META-INF/services/**" />
       <include name="org/apache/crimson/**" />
       <include name="org/xml/**" />
@@ -95,29 +95,20 @@ All generated files are created under ${build.dir}
   <target name="javadoc">
     <mkdir dir="${build.dir}/docs/api"/>
     <javadoc packagenames="org.w3c.*,org.xml.*,javax.xml.*"
-      sourcepath="src"
-      destdir="${build.dir}/docs/api"
-      author="true"
-      version="true"
-      use="true"
-      windowtitle="JAXP 1.1"
-      doctitle="Java API for XML Parsing ${version}"
-      />
+             sourcepath="src"
+             destdir="${build.dir}/docs/api"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="JAXP 1.1"
+             doctitle="Java API for XML Parsing ${version}" />
   </target>
 
   <target name="other.doc">
-    <copyfile src="docs/readme.html" 
-      dest="${build.dir}/readme.html"
-      />
-    <copyfile src="docs/install.html" 
-      dest="${build.dir}/install.html"
-      />
-    <copyfile src="docs/License-RI.html" 
-      dest="${build.dir}/License-RI.html"
-      />
-    <copyfile src="docs/License-ASF" 
-      dest="${build.dir}/License-ASF"
-      />
+    <copyfile src="docs/readme.html" dest="${build.dir}/readme.html" />
+    <copyfile src="docs/install.html" dest="${build.dir}/install.html" />
+    <copyfile src="docs/License-RI.html" dest="${build.dir}/License-RI.html" />
+    <copyfile src="docs/License-ASF" dest="${build.dir}/License-ASF" />
   </target>
 
   <target name="dist" depends="jars,javadoc" >
@@ -141,8 +132,8 @@ All generated files are created under ${build.dir}
     </copy>
 
     <zip zipfile="${build.dir}/${dist.file}.zip"
-      basedir="${build.dir}"
-      includes="${dist.file}/**" />
+         basedir="${build.dir}"
+         includes="${dist.file}/**" />
   </target>
 
   <target name="jars" depends="jaxp.jar,crimson.jar">

@@ -82,6 +82,8 @@ public class XMLReaderImpl implements XMLReader {
     private final static String NAMESPACES = FEATURES + "namespaces";
     private final static String NAMESPACE_PREFIXES =
             FEATURES + "namespace-prefixes";
+    private final static String STRING_INTERNING =
+            FEATURES + "string-interning";
     private final static String VALIDATION = FEATURES + "validation";
     private final static String EXTERNAL_GENERAL =
             FEATURES + "external-general-entities";
@@ -154,7 +156,8 @@ public class XMLReaderImpl implements XMLReader {
             return prefixes;
         } else if (name.equals(VALIDATION)) {
             return validation;
-        } else if (name.equals(EXTERNAL_GENERAL) ||
+        } else if (name.equals(STRING_INTERNING) ||
+                   name.equals(EXTERNAL_GENERAL) ||
                    name.equals(EXTERNAL_PARAMETER)) {
             return true;
         } else if (name.equals(LEXICAL_PARAMETER_ENTITIES)) {
@@ -196,6 +199,10 @@ public class XMLReaderImpl implements XMLReader {
                 parser = null;
             }
             validation = state;
+        } else if (name.equals(STRING_INTERNING)) {
+            // Ignore the request because if state is false, then it is
+            // still legal to perform interning.
+            return;
         } else if (name.equals(EXTERNAL_GENERAL) ||
                    name.equals(EXTERNAL_PARAMETER) ||
                    name.equals(LEXICAL_PARAMETER_ENTITIES)) {

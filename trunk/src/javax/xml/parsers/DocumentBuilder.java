@@ -13,6 +13,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 /**
  * Defines the API to obtain DOM Document instances from an XML
@@ -198,4 +199,9 @@ public abstract class DocumentBuilder {
     
     public abstract Document newDocument();
 
+    /**
+     * Get the DOMImplementation object.
+     */
+
+    public abstract DOMImplementation getDOMImplementation();
 }

@@ -65,11 +65,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 import org.apache.crimson.parser.XMLReaderImpl;
 
 import org.apache.crimson.tree.XmlDocument;
 import org.apache.crimson.tree.XmlDocumentBuilder;
+import org.apache.crimson.tree.DOMImplementationImpl;
 
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
@@ -155,6 +157,10 @@ public class DocumentBuilderImpl extends DocumentBuilder {
 
     public Document newDocument() {
         return new XmlDocument(); 
+    }
+
+    public DOMImplementation getDOMImplementation() {
+        return DOMImplementationImpl.getDOMImplementation(); 
     }
 
     public Document parse(InputSource is) throws SAXException, IOException {

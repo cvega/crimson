@@ -68,12 +68,6 @@ import javax.xml.parsers.ParserConfigurationException;
  * @version $Revision$
  */
 public class DocumentBuilderFactoryImpl extends DocumentBuilderFactory {
-    // By default expand entity references.  This overrides the
-    // DocumentBuilderFactory default.  DOM2 allows either behavior so it
-    // is not clear what the default should be.  I am choosing the value
-    // "true" because that will probably be most useful.
-    // XXX The default needs to be clarified in the JAXP 1.1 spec.
-    private boolean expandEntityRefs = true;
 
     public DocumentBuilderFactoryImpl() {
    	 
@@ -87,22 +81,6 @@ public class DocumentBuilderFactoryImpl extends DocumentBuilderFactory {
     {
 	DocumentBuilderImpl db = new DocumentBuilderImpl(this);
         return db;
-    }
-
-    /**
-     * Specifies that the parser produced by this code will
-     * expand entity reference nodes.
-     */
-    public void setExpandEntityReferences(boolean expandEntityRefs) {
-        this.expandEntityRefs = expandEntityRefs;
-    }
-
-    /**
-     * Indicates whether or not the factory is configured to produce
-     * parsers which expand entity reference nodes.
-     */
-    public boolean isExpandEntityReferences() {
-        return expandEntityRefs;
     }
 
     /**

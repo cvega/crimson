@@ -117,7 +117,7 @@ class CDataNode extends TextNode implements CDATASection
 		if ((i + 2) < data.length
 			&& data [i + 1] == ']'
 			&& data [i + 2] == '>') {
-		    out.write ("]]]]><![CDATA[>");
+		    out.write ("]]]><![CDATA[");
 		    continue;
 		}
 	    }

@@ -69,6 +69,7 @@ import org.w3c.dom.*;
 import org.xml.sax.Attributes;
 
 import org.apache.crimson.parser.AttributesEx;
+import org.apache.crimson.util.XmlNames;
 
 
 /**
@@ -132,16 +133,25 @@ class AttributeSet implements NamedNodeMap, XmlWritable
         }
 
         for (int i = 0; i < len; i++) {
-            // Translate "" of SAX2 to null.  See DOM2 spec under Node
-            // namespaceURI
-            String uri = source.getURI(i);
-            if (uri.equals("")) {
-                uri = null;
+
+            // Process the namespaceURI according to DOM Level 2 spec
+            String uri;
+            String qName = source.getQName(i);
+            if ("xmlns".equals(qName)
+                || "xmlns".equals(XmlNames.getPrefix(qName))) {
+                // Associate the right namespaceURI with "xmlns" attributes
+                uri = AttributeNode.SPEC_XMLNS_URI;
+            } else {
+                uri = source.getURI(i);
+                // Translate "" of SAX2 to null.  See DOM2 spec under Node
+                // namespaceURI
+                if (uri.equals("")) {
+                    uri = null;
+                }
             }
 
             AttributeNode attrNode =
-                new AttributeNode(uri,
-                                  source.getQName(i),
+                new AttributeNode(uri, qName,
                                   source.getValue(i),
                                   ex == null    // remember if it was specified
                                   ? true

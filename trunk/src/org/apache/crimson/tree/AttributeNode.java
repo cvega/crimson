@@ -116,7 +116,7 @@ class AttributeNode extends NamespacedNode implements Attr
 
     private static final String
         SPEC_XML_URI = "http://www.w3.org/XML/1998/namespace";
-    private static final String
+    static final String
         SPEC_XMLNS_URI = "http://www.w3.org/2000/xmlns/";
         
     /** Constructs an attribute node. */

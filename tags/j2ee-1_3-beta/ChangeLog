@@ -1,0 +1,8 @@
+2001-01-30  Edwin Goei  <edwingo@apache.org>
+
+	* Updated website, created zip file for download, misc clean up.
+
+2000-11-22  Edwin Goei  <edwingo@apache.org>
+
+        * Populated the repository with the latest crimson sources.  The
+          build system still needs to be updated and fixed up though.

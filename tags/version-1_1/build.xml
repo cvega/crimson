@@ -1,0 +1,160 @@
+<?xml version="1.0"?> 
+
+<!--
+This is an ant build file compatible with ant version 1.2.
+
+Useful targets:
+    + jars jar  the default target to make jar files
+    + dist      creates a crimson-[version].zip file
+    + clean     deletes all generated files
+
+All generated files are created under ${build.dir}
+-->
+
+<project name="crimson" default="jars" basedir=".">
+
+  <!-- Use this property to set version of crimson -->
+  <property name="version" value="1.1" />
+  <property name="name" value="crimson"/>
+
+  <!-- Build options -->
+  <property name="optimize" value="false" />
+  <property name="debug" value="on" />
+
+  <!-- The name "build" refers to a directory without a version number,
+       while the name "dist" refers to a directory with a version number
+       that can be zipped or tarred.  Unzipping such a zip file will create
+       a directory neatly containing everything in the distribution.  -->
+
+  <property name="build.dir" value="../build/${name}" />
+  <property name="build.classes" value="${build.dir}/classes"/>
+
+  <property name="dist.file" value="${name}-${version}" />
+  <property name="dist.dir" value="${build.dir}/${dist.file}"/>
+
+  <target name="prepare" >
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.classes}"/>
+  </target>
+
+  <!-- ==================== Build  ==================== -->
+
+  <target name="compile" depends="prepare">
+    <javac srcdir="src" 
+           destdir="${build.classes}"
+           debug="${debug}"
+           optimize="${optimize}"
+           deprecation="off" >
+      <classpath>
+        <pathelement location="${build.classes}" />
+        <pathelement location="lib/jaxp.jar" />
+        <pathelement location="src" />
+      </classpath>
+      <exclude name="**/,**" />
+      <exclude name="**/SCCS/**" />
+      <include name="javax/xml/**" />
+      <include name="org/apache/**" />
+      <include name="org/xml/**" />
+      <include name="org/w3c/**" />
+    </javac>
+    <copy 
+      todir="${build.classes}/org/apache" >
+      <fileset dir="src/org/apache" >
+        <include name="**/**.properties" />
+        <exclude name="**/,**" />
+        <exclude name="**/SCCS/**" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="jaxp.jar">
+    <!-- Copy the binary.  XXX The source should be available somewhere
+         under http://java.sun.com/xml as part of the JAXP reference
+         implementation. -->
+    <copy file="lib/jaxp.jar" todir="${build.dir}" />
+  </target>
+
+  <target name="crimson.jar" depends="compile">
+    <mkdir dir="${build.classes}/META-INF/services" />
+    <copy todir="${build.classes}/META-INF/services">
+      <fileset dir="src/META-INF/services">
+        <include name="javax.xml.parsers.SAXParserFactory" />
+        <include name="javax.xml.parsers.DocumentBuilderFactory" />
+      </fileset>
+    </copy>
+    <jar jarfile="${build.dir}/crimson.jar"
+         basedir="${build.classes}"
+         manifest="src/META-INF/manifest.crimson" >
+      <include name="META-INF/services/**" />
+      <include name="org/apache/crimson/**" />
+      <include name="org/xml/**" />
+      <include name="org/w3c/**" /> 
+    </jar>
+  </target>
+
+  <target name="javadoc">
+    <mkdir dir="${build.dir}/docs/api"/>
+    <!-- XXX Temporarily disable building of javadoc because the issue of
+         what to do about the source for javax.xml.* classes still needs to
+         be worked out.  Otherwise there would be no javadoc for the javax
+         classes.  For now, use a statically generated version of the JAXP
+         1.1 javadoc.
+
+    <javadoc packagenames="org.w3c.*,org.xml.*,javax.xml.*"
+             sourcepath="src"
+             destdir="${build.dir}/docs/api"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="JAXP 1.1"
+             doctitle="Java API for XML Parsing ${version}" />
+    -->
+    <unjar src="jaxp-javadoc.jar" dest="${build.dir}/docs"/>
+  </target>
+
+  <target name="other.doc">
+    <copy file="docs/README.txt" todir="${dist.dir}" />
+  </target>
+
+  <target name="dist" depends="jars,javadoc,other.doc" >
+    <!-- Copy the jar files -->
+    <copy file="${build.dir}/${name}.jar" todir="${dist.dir}" />
+    <copy file="${build.dir}/jaxp.jar" todir="${dist.dir}" />
+
+    <!-- Copy sources -->
+    <copy todir="${dist.dir}/src">
+      <fileset dir="src"/>
+    </copy>
+
+    <!-- Copy built documentation and javadoc -->
+    <copy todir="${dist.dir}/docs">
+      <fileset dir="${build.dir}/docs"/>
+    </copy>
+
+    <!-- Copy examples -->
+    <copy todir="${dist.dir}/examples">
+      <fileset dir="examples"/>
+    </copy>
+
+    <zip zipfile="${build.dir}/${dist.file}.zip"
+         basedir="${build.dir}"
+         includes="${dist.file}/**" />
+  </target>
+
+  <target name="jars" depends="jaxp.jar,crimson.jar">
+  </target>
+
+  <target name="jar" depends="jars">
+  </target>
+
+  <target name="all" depends="jars">
+  </target>
+
+  <target name="main" depends="prepare,all,dist">
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+  
+</project>

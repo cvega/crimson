@@ -359,10 +359,10 @@ abstract class ParentNode extends NodeBase
 
 
     /**
-     * <b>DOM:</b>  Inserts the new child before the specified child,
-     * which if null indicates appending the new child to the
-     * current set of children.  The new child must belong to
-     * this particular document.
+     * <b>DOM:</b> Inserts the new child before the specified child, which
+     * if null indicates appending the new child to the current set of
+     * children.  The new child must belong to this particular document.
+     * If the newChild is already in the tree, it is first removed.
      *
      * @param newChild the new child to be inserted
      * @param refChild node before which newChild is to be inserted
@@ -389,6 +389,14 @@ abstract class ParentNode extends NodeBase
 	checkNotAncestor (newChild);
 	checkChildType (newChild.getNodeType ());
 
+        // If the newChild is already in the tree, it is first removed
+        for (int i = 0; i < length; i++) {
+            if (children[i] == newChild) {
+                removeChild(newChild);
+                break;
+            }
+        }
+
 	// grow array if needed
 	if (children.length == length) {
 	    NodeBase temp [] = new NodeBase [length * 2];
@@ -411,9 +419,10 @@ abstract class ParentNode extends NodeBase
     }
 
     /**
-     * <b>DOM:</b>  Replaces the specified child with the new node,
-     * returning the original child or throwing an exception.
-     * The new child must belong to this particular document.
+     * <b>DOM:</b> Replaces the specified child with the new node,
+     * returning the original child or throwing an exception.  The new
+     * child must belong to this particular document.  If the newChild is
+     * already in the tree, it is first removed.
      *
      * @param newChild the new child to be inserted
      * @param refChild node which is to be replaced
@@ -439,6 +448,14 @@ abstract class ParentNode extends NodeBase
 
 	checkNotAncestor (newChild);
 	checkChildType (newChild.getNodeType ());
+
+        // If the newChild is already in the tree, it is first removed
+	for (int i = 0; i < length; i++) {
+            if (children[i] == newChild) {
+                removeChild(newChild);
+                break;
+            }
+        }
 
 	for (int i = 0; i < length; i++) {
 	    if (children [i] != refChild)
@@ -682,7 +699,8 @@ abstract class ParentNode extends NodeBase
      * then reread (and normalized) retains the same content. </P>
      */
     public void normalize() {
-	boolean	preserve = false;
+	boolean	preserve = true;
+// 	boolean	preserve = false;
 	boolean	knowPreserve = false;
 
 	if (readonly) {
@@ -704,8 +722,8 @@ abstract class ParentNode extends NodeBase
                 if (node2 == null || node2.getNodeType() != TEXT_NODE) {
                     // See if xml:space='preserve' is set...
                     if (!knowPreserve) {
-                        preserve = "preserve".equals(
-                            getInheritedAttribute("xml:space"));
+//                         preserve = "preserve".equals(
+//                             getInheritedAttribute("xml:space"));
                         knowPreserve = true;
                     }
 

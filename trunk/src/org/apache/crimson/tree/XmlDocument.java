@@ -826,8 +826,8 @@ public class XmlDocument extends ParentNode implements DocumentEx
      *  but is invalid because the element can't be instantiated or
      *  does not subclass <em>ElementNode</em>.
      */
-    final public Element createElement (String tagName)
-    throws DOMException
+    public Element createElement(String tagName)
+        throws DOMException
     {
         return createElementEx (tagName);
     }

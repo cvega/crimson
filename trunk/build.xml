@@ -4,16 +4,19 @@
 <!--
 This is an ant build file compatible with ant version 1.3.
 
-Useful targets:
-    + jars jar  the default target to make jar files for development
-    + docs      builds all docs into ${dist.dir}
-    + dist      creates a crimson-[version].zip file
-    + clean     deletes all generated files
+See "usage" target below for a list of useful targets.
 
-All generated files are created under ${build.dir}
+All generated files are created under ${build.dir}.
 
-As of (2001-08-13), the build requires a sibling xml-commons module to be a
-peer of this module.
+Note this build has a dependency on xml-commons.  To allow certain java
+source files to be shared across Apache XML projects, this build file tries
+to copy XML API java source files from the following places:
+  1) a sibling xml-commons tree
+  2) then the local tree itself
+When creating a source or binary distribution, case #1 should be used.  If
+you do not use the default name of the xml-commons tree, please be sure to
+set the value of the xml-commons.name property appropriately.  When a user
+downloads a source distribution and unpacks it, then case #2 should be used.
 -->
 
 <project name="crimson" default="jars" basedir=".">
@@ -60,7 +63,7 @@ peer of this module.
     <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
     <include name="org/xml/sax/**"/>
     <include name="javax/xml/parsers/**"/>
-    <!-- Omit TraX
+    <!-- Omit TrAX
       <include name="javax/xml/transform/**"/>
     -->
   </patternset>
@@ -72,7 +75,6 @@ peer of this module.
 
     <available file="${xml-commons.basedir}/build.xml"
       property="xml-commons.present"/>
-    <echo message="xml-commons.present is ${xml-commons.present}"/>
 
     <tstamp>
       <format pattern="yyyy-MM-dd" property="TODAY-ISO"/>
@@ -96,7 +98,7 @@ peer of this module.
 
   <target name="copy-api-src-from-xml-commons" if="xml-commons.present"
     depends="init">
-    <echo>Copying API src from ${xml-commons.basedir}</echo>
+    <echo>*** Copying API src from ${xml-commons.basedir} ...</echo>
     <copy todir="${build.api.src}" includeemptydirs="no">
       <fileset dir="${xml-commons.basedir}/src">
         <patternset refid="api-patternset"/>
@@ -118,19 +120,18 @@ peer of this module.
     depends="copy-api-src-from-xml-commons,copy-api-src-from-local"/>
 
   <target name="compile-api" depends="prepare,copy-api-src">
-    <javac destdir="${build.classes}"
+    <javac srcdir="${build.api.src}"
+           destdir="${build.classes}"
            debug="${debug}"
            optimize="${optimize}"
            deprecation="off">
       <classpath>
         <pathelement location="${build.classes}"/>
       </classpath>
-      <src location="${build.api.src}"/>
       <patternset refid="api-patternset"/>
     </javac>
   </target>
 
-  <!-- XXX Here I am -->
   <!-- Compile parser implementation classes -->
   <target name="compile-impl" depends="prepare">
     <javac srcdir="src" 
@@ -140,14 +141,13 @@ peer of this module.
            deprecation="off" >
       <classpath>
         <pathelement location="${build.classes}" />
-        <pathelement location="${build.dir}/${api.jar.name}" />
-        <pathelement location="src" />
       </classpath>
       <exclude name="**/,**" />
       <exclude name="**/SCCS/**" />
       <include name="org/apache/**" />
     </javac>
     <copy todir="${build.classes}/org/apache">
+      <!-- Copy resouce files -->
       <fileset dir="src/org/apache" >
         <include name="**/**.properties" />
         <exclude name="**/,**" />
@@ -158,7 +158,7 @@ peer of this module.
 
   <!-- This target was used to create a separate JAXP API jar which
         contained only the javax.xml.parsers and javax.xml.transform.*
-        packages. -->
+        packages.  No longer used. -->
   <target name="api-jar" depends="compile-api">
     <jar jarfile="${build.dir}/${api.jar.name}"
          basedir="${build.classes}"
@@ -180,24 +180,20 @@ peer of this module.
          manifest="src/META-INF/manifest.crimson" >
       <include name="META-INF/services/**" />
       <include name="org/apache/crimson/**" />
-      <include name="org/w3c/dom/*"/>
-      <include name="org/xml/sax/**"/>
+      <patternset refid="api-patternset"/>
     </jar>
   </target>
 
-<!-- XXX fix dependencies! -->
-  <target name="jars" depends="">
-  </target>
-<!--
-  <target name="jars" depends="api.jar,crimson.jar">
-  </target>
--->
-
-  <target name="jar" depends="jars">
+  <!-- =================================================================== -->
+  <!-- Usual target for development                                        -->
+  <!-- =================================================================== -->
+  <target name="jar" depends="crimson.jar">
   </target>
 
-<!-- XXX fix dependencies! -->
-  <target name="javadoc" depends="">
+  <target name="jars" depends="jar">
+  </target>
+
+  <target name="javadoc" depends="copy-api-src">
     <mkdir dir="${build.dir}/docs/api"/>
     <javadoc packagenames="org.w3c.dom,org.xml.*,javax.xml.*"
              destdir="${build.dir}/docs/api"
@@ -206,7 +202,9 @@ peer of this module.
              use="true"
              windowtitle="Java API for XML Processing Specification ${jaxp.spec.version}"
              doctitle="Java API for XML Processing Specification ${jaxp.spec.version}">
-      <sourcepath refid="src.path"/>
+      <sourcepath>
+        <pathelement location="${build.api.src}"/>
+      </sourcepath>
     </javadoc>
   </target>
 
@@ -232,70 +230,104 @@ peer of this module.
   <target name="docs" depends="non-javadoc,examples,javadoc">
   </target>
 
-<!-- XXX fix dependencies! -->
-  <target name="dist" depends="jars,docs," >
+  <!-- =================================================================== -->
+  <!-- Prepares the binary distribution                                    -->
+  <!-- =================================================================== -->
+  <target name="pack-bin" depends="jars, docs">
+    <echo message="Building the binary distribution files (zip, tar)"/>
+    <delete dir="${distbin.dir}"/>
+    <mkdir dir="${distbin.dir}"/>
+
     <!-- Copy the built jar files -->
-    <copy file="${build.dir}/crimson.jar" todir="${dist.dir}" />
-    <copy file="${build.dir}/${api.jar.name}" todir="${dist.dir}" />
-
-    <!-- Copy sources -->
-    <copy todir="${dist.dir}/src">
-      <!-- Parser implementation src files -->
-      <fileset dir="src"/>
-
-      <!-- XML API src files -->
-      <fileset dir="${api.basedir}/src">
-        <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
-        <include name="org/xml/sax/**"/>
-        <include name="javax/xml/**"/>
+    <copy todir="${distbin.dir}">
+      <fileset dir="${build.dir}">
+        <include name="*.jar"/>
       </fileset>
     </copy>
 
-    <zip zipfile="${build.dir}/${dist.file}.zip"
-         basedir="${build.dir}"
-         includes="${dist.file}/**" />
+    <!-- Copy doc files -->
+    <copy todir="${distbin.dir}">
+      <fileset dir="${build.dir}">
+        <!-- Copy top level doc files -->
+        <include name="README.html"/>
+        <include name="ChangeLog"/>
+
+        <!-- Copy javadoc and misc doc files -->
+        <include name="docs/**"/>
+
+        <!-- Copy examples -->
+        <include name="examples/**"/>
+      </fileset>
+    </copy>
+
+    <zip zipfile="${build.dir}/crimson-bin-${impl.version}.zip"
+      basedir="${build.dir}" includes="${dist.file}/**"/>
+
+    <tar tarfile="${build.dir}/crimson-bin$-${impl.version}.tar"
+      basedir="${build.dir}" includes="${dist.file}/**"/>
+    <gzip zipfile="${build.dir}/crimson-bin-${impl.version}.tar.gz"
+      src="${build.dir}/crimson-bin-${impl.version}.tar"/>
   </target>
 
-<!-- XXX fix dependencies! -->
-  <target name="pack-src" depends="init," >
-    <echo message="Building the source distribution"/>
+  <!-- =================================================================== -->
+  <!-- Prepares the source distribution                                    -->
+  <!-- =================================================================== -->
+  <target name="pack-src" depends="init,copy-api-src" >
+    <echo message="Building the source distribution files (zip, tar)"/>
     <delete dir="${distsrc.dir}"/>
-
     <mkdir dir="${distsrc.dir}"/>
-    <mkdir dir="${distsrc.dir}/src"/>
 
-    <!-- Copy sources -->
-    <copy todir="${distsrc.dir}/src" includeemptydirs="no">
-      <!-- Parser implementation src files -->
-      <fileset dir="src"/>
+    <copy todir="${distsrc.dir}">
+      <fileset dir=".">
+        <include name="README.txt"/>
+        <include name="build.xml"/>
+        <include name="project.dtd"/>
+        <include name="ChangeLog"/>
+        <include name="docs/**"/>
+        <include name="examples/**"/>
 
-      <!-- XML API src files -->
-      <fileset dir="${api.basedir}/src">
-        <include name="org/w3c/dom/*"/>   <!-- only include DOM core -->
-        <include name="org/xml/sax/**"/>
-        <include name="javax/xml/**"/>
+        <!-- Parser implementation src files -->
+        <include name="src/META-INF/**" />
+        <include name="src/org/apache/crimson/**" />
       </fileset>
     </copy>
 
-    <copy todir="${distsrc.dir}/docs">
-      <fileset dir="docs"/>
+    <!-- Copy XML API sources -->
+    <copy todir="${distsrc.dir}/src" includeemptydirs="no">
+      <fileset dir="${build.api.src}">
+        <patternset refid="api-patternset"/>
+      </fileset>
     </copy>
 
-    <copy todir="${distsrc.dir}/examples">
-      <fileset dir="examples"/>
-    </copy>
+    <zip zipfile="${build.dir}/crimson-src-${impl.version}.zip"
+      basedir="${build.dir}" includes="${dist.file}/**"/>
 
-    <copy file="README.txt" todir="${distsrc.dir}"/>
-    <copy file="build.xml" todir="${distsrc.dir}"/>
-    <copy file="ChangeLog" todir="${distsrc.dir}"/>
-    <copy file="project.dtd" todir="${distsrc.dir}"/>
+    <tar tarfile="${build.dir}/crimson-src$-${impl.version}.tar"
+      basedir="${build.dir}" includes="${dist.file}/**"/>
+    <gzip zipfile="${build.dir}/crimson-src-${impl.version}.tar.gz"
+      src="${build.dir}/crimson-src-${impl.version}.tar"/>
+  </target>
 
-    <zip zipfile="${build.dir}/${dist.file}.zip"
-         basedir="${build.dir}"
-         includes="${dist.file}/**" />
+  <target name="dist" depends="pack-bin, pack-src">
   </target>
 
   <target name="clean">
     <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Help on usage                                                       -->
+  <!-- =================================================================== -->
+  <target name="usage">
+    <echo message="Crimson build targets:"/>
+    <echo>+ jars jar  default target to make jar files for development</echo>
+    <echo>+ docs      builds all docs</echo>
+    <echo>+ clean     deletes all generated files</echo>
+    <echo>+ pack-bin  creates a binary distribution</echo>
+    <echo>+ pack-src  creates a source distribution</echo>
+    <echo>+ dist      creates both a binary and src distribution</echo>
+    <echo>See comments inside the build.xml file for more details</echo>
+  </target>
+  <target name="help" depends="usage">
   </target>
 </project>

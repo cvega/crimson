@@ -86,7 +86,7 @@ public class XmlNames
      */
     public static boolean isName (String value)
     {
-	if (value == null)
+	if (value == null || "".equals(value))
 	    return false;
 
 	char c = value.charAt (0);

@@ -513,9 +513,17 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
     {
 	if (readonly)
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
-	if (attributes == null)
-	    throw new DomEx (DomEx.NOT_FOUND_ERR);
-        attributes.removeNamedItem (name);
+	if (attributes == null) {
+            return;
+        }
+        try {
+            attributes.removeNamedItem (name);
+        } catch (DOMException x) {
+            // DOM2 does not allow a NOT_FOUND_ERR exception to be thrown
+            if (x.code != DOMException.NOT_FOUND_ERR) {
+                throw x;
+            }
+        }
     }
 
     /**
@@ -528,7 +536,14 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
 	if (readonly) {
 	    throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
         }
-        attributes.removeNamedItemNS(namespaceURI, localName);
+        try {
+            attributes.removeNamedItemNS(namespaceURI, localName);
+        } catch (DOMException x) {
+            // DOM2 does not allow a NOT_FOUND_ERR exception to be thrown
+            if (x.code != DOMException.NOT_FOUND_ERR) {
+                throw x;
+            }
+        }
     }
 
     /** <b>DOM:</b>  returns the attribute */
@@ -570,15 +585,6 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
 	removeAttribute (attr.getNodeName ());
 	return attr;
     }
-
-//     void printClone(ElementNode2 n) {
-//         System.out.println("n=" + n);
-//         System.out.println("n.od=" + n.getOwnerDocument());
-//         Node n2 = n.attributes.getNamedItem("id");
-//         System.out.println("n2.value=" + n2.getNodeValue());
-//         System.out.println("n2.od=" + n2.getOwnerDocument());
-//         System.out.println("n2.oe=" + ((Attr)n2).getOwnerElement());
-//     }
 
     /**
      * Creates a new unparented node whose attributes are the same as

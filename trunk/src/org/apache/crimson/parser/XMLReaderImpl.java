@@ -200,9 +200,11 @@ public class XMLReaderImpl implements XMLReader {
             }
             validation = state;
         } else if (name.equals(STRING_INTERNING)) {
-            // Ignore the request because if state is false, then it is
-            // still legal to perform interning.
-            return;
+            if (state == false) {
+                throw new SAXNotSupportedException("Feature: " + name
+                                                   + " State: false");
+            }
+            // else true is OK
         } else if (name.equals(EXTERNAL_GENERAL) ||
                    name.equals(EXTERNAL_PARAMETER) ||
                    name.equals(LEXICAL_PARAMETER_ENTITIES)) {

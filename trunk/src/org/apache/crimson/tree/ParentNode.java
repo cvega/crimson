@@ -692,6 +692,8 @@ abstract class ParentNode extends NodeBase
      * by markup such as elements or processing instructions, since it
      * can require arbitrarily large blocks of contiguous memory.
      *
+     * XXX The following extension breaks a DOM conformance test so the
+     * code has been modified to not behave as described:
      * <P> As a compatible extension to DOM, this normalizes treatment
      * of whitespace except when the <em>xml:space='preserve'</em>
      * attribute value applies to a node.  All whitespace is normalized
@@ -699,8 +701,7 @@ abstract class ParentNode extends NodeBase
      * then reread (and normalized) retains the same content. </P>
      */
     public void normalize() {
-	boolean	preserve = true;
-// 	boolean	preserve = false;
+	boolean	preserve = false;
 	boolean	knowPreserve = false;
 
 	if (readonly) {
@@ -720,10 +721,14 @@ abstract class ParentNode extends NodeBase
             case TEXT_NODE: {
                 Node node2 = item(i + 1);
                 if (node2 == null || node2.getNodeType() != TEXT_NODE) {
+                    if (false) {
+                        // The following code breaks DOM conformance so this
+                        // feature is turned off.
+
                     // See if xml:space='preserve' is set...
                     if (!knowPreserve) {
-//                         preserve = "preserve".equals(
-//                             getInheritedAttribute("xml:space"));
+                        preserve = "preserve".equals(
+                            getInheritedAttribute("xml:space"));
                         knowPreserve = true;
                     }
 
@@ -747,9 +752,9 @@ abstract class ParentNode extends NodeBase
                             ((TextNode)node).data = tmp;
                         }
                     }
+                    }
                     continue;
                 }
-		    
                 ((TextNode) node).joinNextText();
                 i--;
                 continue;

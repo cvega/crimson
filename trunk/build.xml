@@ -1,7 +1,7 @@
 <?xml version="1.0"?> 
 
 <!--
-This is an ant build file compatible with ant version 1.2.
+This is an ant build file compatible with ant version 1.3.
 
 Useful targets:
     + jars jar  the default target to make jar files
@@ -9,12 +9,15 @@ Useful targets:
     + clean     deletes all generated files
 
 All generated files are created under ${build.dir}
+
+As of (2001-08-13), the build requires a sibling xml-commons module to be a
+peer of this module.
 -->
 
 <project name="crimson" default="jars" basedir=".">
 
   <!-- Use this property to set version of crimson -->
-  <property name="impl.version" value="1.1.1" />
+  <property name="impl.version" value="1.1.2beta2" />
   <property name="name" value="crimson"/>
 
   <!-- Build options -->
@@ -26,11 +29,21 @@ All generated files are created under ${build.dir}
        that can be zipped or tarred.  Unzipping such a zip file will create
        a directory neatly containing everything in the distribution.  -->
 
-  <property name="build.dir" value="../build/${name}" />
+  <property name="build.dir" value="build" />
   <property name="build.classes" value="${build.dir}/classes"/>
 
   <property name="dist.file" value="${name}-${impl.version}" />
   <property name="dist.dir" value="${build.dir}/${dist.file}"/>
+
+  <!-- Points to tree containing common XML APIs shared between various
+       Apache XML projects.  The base directory contains the build.xml file
+       used to build the common api jar file. -->
+  <property name="api.base.dir" value="../xml-commons/java/external"/>
+  <property name="api.build.dir" value="${api.base.dir}/build"/>
+  <property name="api.jar.name" value="xml-apis.jar"/>
+<!-- XXX This task does not work with Ant 1.3 for some unknown reason
+  <available file="${api.base.dir}/build.xml" property="api.base.dir.present"/>
+-->
 
   <target name="prepare" >
     <mkdir dir="${build.dir}"/>
@@ -47,15 +60,12 @@ All generated files are created under ${build.dir}
            deprecation="off" >
       <classpath>
         <pathelement location="${build.classes}" />
-        <pathelement location="lib/jaxp.jar" />
+        <pathelement location="${build.dir}/${api.jar.name}" />
         <pathelement location="src" />
       </classpath>
       <exclude name="**/,**" />
       <exclude name="**/SCCS/**" />
-      <include name="javax/xml/**" />
       <include name="org/apache/**" />
-      <include name="org/xml/**" />
-      <include name="org/w3c/**" />
     </javac>
     <copy 
       todir="${build.classes}/org/apache" >
@@ -67,12 +77,16 @@ All generated files are created under ${build.dir}
     </copy>
   </target>
 
-  <target name="jaxp.jar">
-    <!-- Copy the binary.  XXX The source is available under xml-commons. -->
-    <copy file="lib/jaxp.jar" todir="${build.dir}" />
+  <target name="api.base.dir" unless="api.base.dir.present">
+    <echo message="The xml-commons module must be a sibling of this one."/>
   </target>
 
-  <target name="crimson.jar" depends="compile">
+  <target name="api.jar" depends="api.base.dir">
+    <ant dir="${api.base.dir}" target="jar"/>
+    <copy file="${api.build.dir}/${api.jar.name}" todir="${build.dir}" />
+  </target>
+
+  <target name="crimson.jar" depends="api.jar,compile">
     <mkdir dir="${build.classes}/META-INF/services" />
     <copy todir="${build.classes}/META-INF/services">
       <fileset dir="src/META-INF/services">
@@ -85,43 +99,36 @@ All generated files are created under ${build.dir}
          manifest="src/META-INF/manifest.crimson" >
       <include name="META-INF/services/**" />
       <include name="org/apache/crimson/**" />
-      <include name="org/xml/**" />
-      <include name="org/w3c/**" /> 
     </jar>
   </target>
 
-  <target name="javadoc">
-    <mkdir dir="${build.dir}/docs/api"/>
-    <!-- XXX Temporarily disable building of javadoc because the issue of
-         what to do about the source for javax.xml.* classes still needs to
-         be worked out.  Otherwise there would be no javadoc for the javax
-         classes.  For now, use a statically generated version of the JAXP
-         1.1 javadoc.
-
-    <javadoc packagenames="org.w3c.*,org.xml.*,javax.xml.*"
-             sourcepath="src"
-             destdir="${build.dir}/docs/api"
-             author="true"
-             version="true"
-             use="true"
-             windowtitle="JAXP 1.1"
-             doctitle="Java API for XML Processing 1.1" />
-    -->
-    <unjar src="jaxp-javadoc.jar" dest="${build.dir}/docs"/>
+  <target name="javadoc" depends="api.base.dir">
+    <ant dir="${api.base.dir}" target="javadoc">
+    </ant>
+    <mkdir dir="${build.dir}/docs/javadoc"/>
+    <copy todir="${build.dir}/docs/javadoc">
+      <fileset dir="${api.build.dir}/docs/javadoc">
+      </fileset>
+    </copy>
   </target>
 
   <target name="other.doc">
     <copy file="docs/README.txt" todir="${dist.dir}" />
+    <copy file="ChangeLog" todir="${dist.dir}" />
   </target>
 
-  <target name="dist" depends="jars,javadoc,other.doc" >
+  <target name="dist" depends="jars,javadoc,other.doc,api.base.dir" >
     <!-- Copy the jar files -->
     <copy file="${build.dir}/${name}.jar" todir="${dist.dir}" />
-    <copy file="${build.dir}/jaxp.jar" todir="${dist.dir}" />
+    <copy file="${build.dir}/${api.jar.name}" todir="${dist.dir}" />
 
     <!-- Copy sources -->
     <copy todir="${dist.dir}/src">
+      <!-- Parser implementation src files -->
       <fileset dir="src"/>
+
+      <!-- XML API src files -->
+      <fileset dir="${api.base.dir}/src"/>
     </copy>
 
     <!-- Copy built documentation and javadoc -->
@@ -139,7 +146,7 @@ All generated files are created under ${build.dir}
          includes="${dist.file}/**" />
   </target>
 
-  <target name="jars" depends="jaxp.jar,crimson.jar">
+  <target name="jars" depends="api.jar,crimson.jar">
   </target>
 
   <target name="jar" depends="jars">
@@ -153,6 +160,7 @@ All generated files are created under ${build.dir}
 
   <target name="clean">
     <delete dir="${build.dir}"/>
+    <ant dir="${api.base.dir}" target="clean"/>
   </target>
   
 </project>

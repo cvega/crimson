@@ -755,15 +755,6 @@ public class XmlDocument extends ParentNode implements DocumentEx
         }
     }
 
-    // XXX Obsolete remove this method!
-    // package private!!
-    Doctype createDoctype (String name)
-    {
-        Doctype retval = new Doctype (name);
-        retval.setOwnerDocument (this);
-        return retval;
-    }
-
     /**
      * Establishes how the document prints its document type.  If a system
      * ID (URI) is provided, that is used in a SYSTEM (or PUBLIC, if a public

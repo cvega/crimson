@@ -91,15 +91,9 @@ final class Doctype extends NodeBase implements DocumentType
     private String	internalSubset;
 
 
-    // XXX Obsolete remove this constructor and other obsolete ones too
-    // package private
-    Doctype (String n)
-    {
-	name = n;
-	entities = new Nodemap ();
-	notations = new Nodemap ();
-    }
-
+    /**
+     * XXX Obsolete, but keep it for backwards compatibility
+     */
     // package private
     Doctype (String pub, String sys, String subset)
     {
@@ -108,7 +102,9 @@ final class Doctype extends NodeBase implements DocumentType
 	internalSubset = subset;
     }
 
-    // New DOM2 constructor
+    /**
+     * New DOM Level 2 constructor
+     */
     // package private
     Doctype(String name, String publicId, String systemId,
             String internalSubset)
@@ -174,13 +170,14 @@ final class Doctype extends NodeBase implements DocumentType
     public String getNodeName ()
 	{ return name; }
     
-    /** DOM: NYI
-     * @deprecated Not yet implemented.
+    /**
+     * Only implement shallow clone for now, which is allowed in DOM Level 2.
      */
-    public Node cloneNode (boolean deep)
+    public Node cloneNode(boolean deep)
     {
-// XXX
-	throw new RuntimeException (getMessage ("DT-000"));
+        Doctype retval = new Doctype(name, publicId, systemId, internalSubset);
+        retval.setOwnerDocument((XmlDocument)getOwnerDocument());
+        return retval;
     }
 
     /**

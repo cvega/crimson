@@ -1237,6 +1237,9 @@ public class XmlDocument extends ParentNode implements DocumentEx
     public Node importNode(Node importedNode, boolean deep)
         throws DOMException
     {
+        // First make a copy of the subtree, then change the ownerDocument
+        // of the subtree.
+
         Node node = null;
 
         switch (importedNode.getNodeType()) {

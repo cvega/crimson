@@ -149,6 +149,11 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         retval.userObject = userObject;
 
         if (deep) {
+            // Copy ownerDocument to prevent appendChild() from throwing
+            // WRONG_DOCUMENT_ERR for deep copies.  This gets changed to
+            // the correct ownerDocument later in Document.importNode().
+            retval.ownerDocument = ownerDocument;
+
             for (int i = 0; true; i++) {
                 Node node = item(i);
                 if (node == null) {

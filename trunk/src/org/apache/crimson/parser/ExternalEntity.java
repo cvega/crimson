@@ -77,6 +77,7 @@ class ExternalEntity extends EntityDecl
     String	systemId;	// resolved URI (not relative)
     String	publicId;	// "-//xyz//....//en"
     String	notation;
+    String      verbatimSystemId;       // unresolved URI
     
     public ExternalEntity (Locator l) { }
     

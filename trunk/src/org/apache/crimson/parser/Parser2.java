@@ -1117,7 +1117,7 @@ public class Parser2
         if (maybeWhitespace ()
                 && (externalSubset = maybeExternalID ()) != null) {
             lexicalHandler.startDTD(rootElementName, externalSubset.publicId,
-                                    externalSubset.systemId);
+                                    externalSubset.verbatimSystemId);
             maybeWhitespace ();
         } else {
             lexicalHandler.startDTD(rootElementName, null, null);
@@ -2652,7 +2652,7 @@ public class Parser2
     }
 
     private ExternalEntity maybeExternalID ()
-    throws IOException, SAXException
+        throws IOException, SAXException
     {
         // [75] ExternalID ::= 'SYSTEM' S SystemLiteral
         //              | 'PUBLIC' S' PubidLiteral S Systemliteral
@@ -2668,14 +2668,21 @@ public class Parser2
         retval = new ExternalEntity (in);
         retval.publicId = temp;
         whitespace ("F-008");
-        retval.systemId = parseSystemId ();
+        retval.verbatimSystemId = getQuotedString("F-034", null);
+        retval.systemId = resolveURI(retval.verbatimSystemId);
         return retval;
     }
 
-    private String parseSystemId ()
-    throws IOException, SAXException
+    private String parseSystemId()
+        throws IOException, SAXException
     {
-        String uri = getQuotedString ("F-034", null);
+        String uri = getQuotedString("F-034", null);
+        return resolveURI(uri);
+    }
+
+    private String resolveURI(String uri)
+        throws SAXException
+    {
         int     temp = uri.indexOf (':');
 
         // resolve relative URIs ... must do it here since

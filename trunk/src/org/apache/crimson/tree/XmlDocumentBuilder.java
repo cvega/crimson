@@ -567,25 +567,7 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 	if (ignoreWhitespace)
 	    return;
 
-        ParentNode	top = elementStack [topOfStack];
-
-	if (inCDataSection) {
-	    String		temp = new String (buf, offset, len);
-	    CDATASection	section;
-
-	    section = (CDATASection) top.getLastChild ();
-	    section.appendData (temp);
-	    return;
-	}
-
-        TextNode	text = document.newText (buf, offset, len);
-        
-	try {
-	    top.appendChild (text);
-	} catch (DOMException ex) {
-	    throw new SAXParseException(getMessage("XDB-004",
-                    new Object[] { ex.getMessage() }), locator, ex);
-	}
+        characters(buf, offset, len);
     }
     
     /**

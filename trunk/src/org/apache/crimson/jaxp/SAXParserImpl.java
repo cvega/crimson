@@ -67,17 +67,17 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.HandlerBase;
 import org.xml.sax.Parser;
 import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 import org.xml.sax.helpers.XMLReaderAdapter;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
-import org.apache.crimson.parser.XMLReaderImpl;
-
 import java.util.*;
 
 /**
  * @author Rajiv Mordani
+ * @author Edwin Goei
  * @version $Revision$
  */
 
@@ -86,6 +86,10 @@ import java.util.*;
  * <code>javax.xml.parsers.SAXParser</code>. 
  */
 public class SAXParserImpl extends SAXParser {
+    /** Default parser name. */
+    static final String DEFAULT_PARSER_NAME =
+                                    "org.apache.crimson.parser.XMLReaderImpl";
+
     private SAXParserFactory spf = null;
     private XMLReader xmlReader;
     private Parser parser = null;
@@ -93,31 +97,36 @@ public class SAXParserImpl extends SAXParser {
     private boolean validating = false;
     private boolean namespaceAware = false;
     
-    SAXParserImpl(SAXParserFactory spf)
-        throws SAXNotSupportedException, SAXNotRecognizedException
+    /**
+     * Create a SAX parser with the associated features
+     * @param features Hashtable of SAX features, may be null
+     */
+    SAXParserImpl(SAXParserFactory spf, Hashtable features)
+        throws SAXException
     {
-        this.spf = spf;
-
-        xmlReader = new XMLReaderImpl();
+        xmlReader = XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
 
         // Validation
         validating = spf.isValidating();
         String validation = "http://xml.org/sax/features/validation";
-        xmlReader.setFeature(validation, validating);
 
         // If validating, provide a default ErrorHandler that prints
         // validation errors with a warning telling the user to set an
-        // ErrorHandler
+        // ErrorHandler.  Note: this does not handle all cases.
         if (validating) {
             xmlReader.setErrorHandler(new DefaultValidationErrorHandler());
         }
 
+        // Allow SAX parser to use a different ErrorHandler if it wants to
+        xmlReader.setFeature(validation, validating);
+
         if (spf.isNamespaceAware()) {
             namespaceAware = true;
-	    // XXX ??? Crimson does support namespaces, isn't it ??
-	    //             throw new ParserConfigurationException(
-	    //                 "Namespace not supported by SAXParser");
+	    // XXX default value of namespaceAware conflicts with SAX2
+	    // namespaces feature so do nothing for now
         }
+
+        setFeatures(features);
     }
 
     /**
@@ -127,7 +136,7 @@ public class SAXParserImpl extends SAXParser {
      * XXX Does not handle possible conflicts between SAX feature names and
      * JAXP specific feature names, eg. SAXParserFactory.isValidating()
      */
-    void setFeatures(Hashtable features)
+    private void setFeatures(Hashtable features)
         throws SAXNotSupportedException, SAXNotRecognizedException
     {
         if (features != null) {
@@ -155,7 +164,7 @@ public class SAXParserImpl extends SAXParser {
      * Returns the XMLReader that is encapsulated by the implementation of
      * this class.
      */
-    public XMLReader getXMLReader() throws SAXException {
+    public XMLReader getXMLReader() {
         return xmlReader;
     }
 
@@ -186,6 +195,4 @@ public class SAXParserImpl extends SAXParser {
     {
         return xmlReader.getProperty(name);
     }
-
-
 }

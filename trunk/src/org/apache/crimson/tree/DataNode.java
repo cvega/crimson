@@ -193,7 +193,7 @@ abstract class DataNode extends NodeBase implements CharacterData
         if (isReadonly ())
 	    throw new DomEx (DomEx.NO_MODIFICATION_ALLOWED_ERR);
 
-	if (offset < 0 || offset >= data.length)
+	if (offset < 0 || offset > data.length)
 	    throw new DomEx (DOMException.INDEX_SIZE_ERR);
 
 	int	length = newData.length ();

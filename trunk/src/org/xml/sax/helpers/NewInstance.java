@@ -1,11 +1,30 @@
+// NewInstance.java - create a new instance of a class by name.
+// Written by Edwin Goei, edwingo@apache.org
+// NO WARRANTY!  This class is in the Public Domain.
+
+// $Id$
+
 package org.xml.sax.helpers;
 
 /**
- * This code is designed to run on JDK version 1.1 and later including JVMs
- * that perform early linking like the Microsoft JVM in IE 5.  Note however
- * that it must be compiled on a JDK version 1.2 or later system since it
- * calls Thread#getContextClassLoader().  The code also runs both as part
- * of an unbundled jar file and when bundled as part of the JDK.
+ * Create a new instance of a class by name.
+ *
+ * <blockquote>
+ * <em>This module, both source code and documentation, is in the
+ * Public Domain, and comes with <strong>NO WARRANTY</strong>.</em>
+ * </blockquote>
+ *
+ * <p>This class contains a static method for creating an instance of a
+ * class from an explicit class name.  It tries to use the thread's context
+ * ClassLoader if possible and falls back to using
+ * Class.forName(String).</p>
+ *
+ * <p>This code is designed to run on JDK version 1.1 and later including
+ * JVMs that perform early linking like the Microsoft JVM in IE 5.  Note
+ * however that it must be compiled on a JDK version 1.2 or later system
+ * since it calls Thread#getContextClassLoader().  The code also runs both
+ * as part of an unbundled jar file and when bundled as part of the
+ * JDK.</p>
  */
 class NewInstance {
     /**

@@ -71,10 +71,10 @@ import org.apache.crimson.util.XmlNames;
  */
 abstract class NamespacedNode extends ParentNode {
     /**
-     * Field "name" can be used to hold any XML REC "[5] Name" including a
+     * Field "qName" can be used to hold any XML REC "[5] Name" including a
      * Namespaces REC "[6] QName".
      */
-    protected String name;
+    protected String qName;
 
     protected String namespaceURI;
 
@@ -95,7 +95,7 @@ abstract class NamespacedNode extends ParentNode {
      * @since DOM Level 2
      */
     public String getPrefix() {
-        return XmlNames.getPrefix(name);
+        return XmlNames.getPrefix(qName);
     }
 
     /**
@@ -108,12 +108,12 @@ abstract class NamespacedNode extends ParentNode {
             throw new DomEx(DomEx.NO_MODIFICATION_ALLOWED_ERR);
         }
 
-	int index = name.indexOf(':');
+	int index = qName.indexOf(':');
 
         // prefix == null implies reset to no default namespace
 	if (prefix == null) {
 	    if (index >= 0) {
-	    	name = name.substring(index + 1);
+	    	qName = qName.substring(index + 1);
             }
 	    return;
 	}
@@ -133,7 +133,7 @@ abstract class NamespacedNode extends ParentNode {
         if (getNodeType() == ATTRIBUTE_NODE) {
             if ("xmlns".equals(prefix)
                     && !XmlNames.SPEC_XMLNS_URI.equals(namespaceURI)
-                || "xmlns".equals(name)) {
+                || "xmlns".equals(qName)) {
                 throw new DomEx(DomEx.NAMESPACE_ERR);
             }
         }
@@ -142,11 +142,11 @@ abstract class NamespacedNode extends ParentNode {
    	StringBuffer tmp = new StringBuffer(prefix);
 	tmp.append(':');
 	if (index < 0 ) {
-	    tmp.append(name);
+	    tmp.append(qName);
 	} else {
-	    tmp.append(name.substring(index + 1));
+	    tmp.append(qName.substring(index + 1));
         }
-	name = tmp.toString();
+	qName = tmp.toString();
     }
 
     /**
@@ -155,6 +155,15 @@ abstract class NamespacedNode extends ParentNode {
      * @since DOM Level 2
      */
     public String getLocalName() {
-        return XmlNames.getLocalPart(name);
+        return XmlNames.getLocalPart(qName);
+    }
+
+    /**
+     * Returns the nodeName of this node
+     *
+     * @since DOM Level 1
+     */
+    public String getNodeName() {
+        return qName;
     }
 }

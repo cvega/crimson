@@ -87,11 +87,11 @@ class AttributeSet implements NamedNodeMap, XmlWritable
 {
     private boolean     readonly;
     private Vector      list;
-    private ElementNode ownerElement;
+    private Element     ownerElement;
         
     /* Constructs an attribute list, with associated name scope. */
     // package private
-    AttributeSet(ElementNode ownerElement) {
+    AttributeSet(Element ownerElement) {
         list = new Vector (5);
         this.ownerElement = ownerElement;
     }
@@ -187,9 +187,9 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     }
 
     // package private
-    void setOwnerElement(ElementNode e) {
+    void setOwnerElement(Element e) {
         if (e != null && ownerElement != null) {
-            throw new IllegalStateException(e.getMessage("A-004"));
+            throw new IllegalStateException(((NodeBase)e).getMessage("A-004"));
         }
         ownerElement = e;
 

@@ -59,41 +59,14 @@
 package org.apache.crimson.tree;
 
 /**
- * A DOM Element that was created with a Level 1 create method.  Note that
- * the name ElementNode is maintained for backwards compatibility with
- * element factories which may subclass using this name.
+ * A DOM Attr that was created with a Level 1 create method.
  */
-public class ElementNode extends ElementNode2
+public class AttributeNode1 extends AttributeNode
 {
-    /**
-     * Partially constructs an element; its tag will be assigned by the
-     * element factory (or subclass), while attributes and the parent (and
-     * implicitly, siblings) will be assigned when it is joined to a DOM
-     * document.
-     *
-     * Element factories are deprecated.  For backwards compatibility only.
-     */
-    public ElementNode() {
-        super(null, null);
-    }
-
-    /**
-     * Construct an element with a particular XML REC "Name".
-     */
-    public ElementNode(String name) {
-        super(null, name);
-    }
-
-    /**
-     * Assigns the element's name, when the element has been
-     * constructed using the default constructor.  For use by
-     * element factories potentially by custom subclasses. 
-     *
-     * @deprecated Element factories are deprecated.  For backwards
-     * compatibility only.
-     */
-    protected void setTag(String t) {
-        qName = t;
+    public AttributeNode1(String name, String value, boolean specified,
+                          String defaultValue)
+    {
+        super(null, name, value, specified, defaultValue);
     }
 
     /**

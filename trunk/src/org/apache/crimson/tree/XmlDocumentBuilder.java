@@ -471,15 +471,21 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 	// Then create the element, associate its attributes, and
 	// stack it for later addition.
 	//
-        ElementNode e = null;
+        ElementNode2 e = null;
 	try {
-            if (namespaceURI.equals("")) {
-                // No namespaceURI.  Enable element factory backward
-                // compatibility.
-                e = (ElementNode)document.createElementEx(rawName);
+            if ("".equals(namespaceURI)) {
+                // No namespaceURI
+                if (disableNamespaces) {
+                    // Enable element factory backward compatibility using
+                    // DOM Level 1 methods
+                    e = (ElementNode2)document.createElementEx(rawName);
+                } else {
+                    // Use DOM Level 2 method
+                    e = (ElementNode2)document.createElementNS(null, rawName);
+                }
             } else {
-                e = (ElementNode)document.createElementNS(namespaceURI,
-                                                          rawName);
+                e = (ElementNode2)document.createElementNS(namespaceURI,
+                                                           rawName);
             }
 	} catch (DOMException ex) {
 	    throw new SAXParseException(getMessage("XDB-004",
@@ -513,7 +519,7 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
                            String rawName)
 	throws SAXException
     {
-        ElementNode e = (ElementNode) elementStack[topOfStack];
+        ParentNode e = (ParentNode) elementStack[topOfStack];
 
         elementStack[topOfStack--] = null;
 

@@ -102,38 +102,22 @@ import org.apache.crimson.util.XmlNames;
  * @author Rajiv Mordani
  * @version $Revision$
  */
-final   // at least for the moment
-// public
-class AttributeNode extends NamespacedNode implements Attr
+public class AttributeNode extends NamespacedNode implements Attr
 {
     private String value;
     private boolean specified;
     private String defaultValue;
 
     /** At construction time ownerElement is null, it gets set whenever an
-        attribute is set on an ElementNode */
+        attribute is set on an Element */
     private Element ownerElement;
-
-    /** Constructs an attribute node. */
-    public AttributeNode(String name, String value,
-        boolean specified, String defaultValue)
-    throws DOMException
-    {
-        if (!XmlNames.isName(name))
-            throw new DomEx (DOMException.INVALID_CHARACTER_ERR);
-
-        this.name = name;
-        this.value = value;
-        this.specified = specified;
-        this.defaultValue = defaultValue;
-    }
 
     /** Constructs an attribute node. Used for SAX2 and DOM2 */
     public AttributeNode(String namespaceURI, String qName,
                          String value, boolean specified, String defaultValue)
         throws DOMException
     {
-        name = qName;
+        this.qName = qName;
         this.namespaceURI = namespaceURI;
         this.value = value;
         this.specified = specified;
@@ -204,7 +188,7 @@ class AttributeNode extends NamespacedNode implements Attr
     }
 
     // package private
-    void setOwnerElement(ElementNode element) {
+    void setOwnerElement(Element element) {
         if (element != null && ownerElement != null) {
             throw new IllegalStateException(getMessage("A-000", 
                             new Object[] { element.getTagName() }));
@@ -217,10 +201,7 @@ class AttributeNode extends NamespacedNode implements Attr
     public short getNodeType () { return ATTRIBUTE_NODE; }
 
     /** DOM:  Returns the attribute name */
-    public String getName () { return name; }
-
-    /** DOM:  Returns the attribute name */
-    public String getNodeName () { return name; }
+    public String getName () { return qName; }
 
     /** DOM:  Returns the attribute value. */
     public String getValue () { return value; }
@@ -265,7 +246,7 @@ class AttributeNode extends NamespacedNode implements Attr
     {
         Writer  out = context.getWriter ();
 
-        out.write (name);
+        out.write (qName);
         out.write ("=\"");
         writeChildrenXml (context);
         out.write ('"');
@@ -310,7 +291,7 @@ class AttributeNode extends NamespacedNode implements Attr
         try {
             // XXX should probably use Java Cloneable scheme instead
             AttributeNode attr =
-                new AttributeNode(namespaceURI, name, value, specified,
+                new AttributeNode(namespaceURI, qName, value, specified,
                                   defaultValue);
             attr.setOwnerDocument((XmlDocument)getOwnerDocument());
             if (deep) {

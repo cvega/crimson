@@ -144,8 +144,8 @@ abstract class NodeBase
 	Attr		value = null;
 
 	do {
-	    if (current instanceof ElementNode) {
-		ElementNode	e = (ElementNode) current;
+	    if (current instanceof ElementNode2) {
+		ElementNode2 e = (ElementNode2) current;
 
 		if ((value = e.getAttributeNode (name)) != null)
 		    break;
@@ -341,7 +341,7 @@ abstract class NodeBase
 
     /**
      * <b>DOM:</b> returns null.
-     * Overridden by the ElementNode subclass.
+     * Overridden by the ElementNode2 subclass.
      */
     public NamedNodeMap       getAttributes ()
 	{ return null; }
@@ -364,7 +364,7 @@ abstract class NodeBase
 
     /**
      * <b>DOM2:</b> returns null.
-     * Overridden by subclasses that support namespaces, ie. ElementNode and
+     * Overridden by subclasses that support namespaces, ie. ElementNode2 and
      * AttributeNode.
      */
     public String getNamespaceURI() {
@@ -397,7 +397,7 @@ abstract class NodeBase
 
     /**
      * Returns whether this node (if it is an element) has any attributes.
-     * Overridden by ElementNode
+     * Overridden by Element implementations
      * @since DOM Level 2
      */
     public boolean hasAttributes() {

@@ -316,25 +316,6 @@ public class XmlDocument extends ParentNode implements DocumentEx
         return builder.getDocument();
     }
 
-    /*
-     * Returns the top level document element.
-     * This is a convenience function in the big picture;
-     * use the DOM version instead, at least for now.
-     */
-    // package private
-    ElementNode getDocument ()
-    {
-        // We ignore comments, PIs, whitespace, etc
-        // and return the first (only!) element.
-        for (int i = 0; true; i++) {
-            Node n = item (i);
-            if (n == null)
-                return null;
-            if (n instanceof ElementNode)
-                return (ElementNode) n;
-        }
-    }
-
     /**
      * Returns the locale to be used for diagnostic messages.
      */
@@ -676,7 +657,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
     public Node appendChild (Node n)
     throws DOMException
     {
-        if (n instanceof Element && getDocument () != null)
+        if (n instanceof Element && getDocumentElement () != null)
             throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
         if (n instanceof DocumentType && getDoctype () != null)
             throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
@@ -694,7 +675,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
     throws DOMException
     {
         if (!replaceRootElement && n instanceof Element && 
-            getDocument () != null)
+            getDocumentElement () != null)
             throw new DomEx (DomEx.HIERARCHY_REQUEST_ERR);
         if (!replaceRootElement && n instanceof DocumentType 
             && getDoctype () != null)
@@ -796,9 +777,22 @@ public class XmlDocument extends ParentNode implements DocumentEx
     }
 
     
-    /** DOM: Returns the content root element. */
+    /**
+     * DOM: Returns the content root element.
+     */
     public Element getDocumentElement ()
-	{ return getDocument (); }
+    {
+        // We ignore comments, PIs, whitespace, etc
+        // and return the first (only!) element.
+        for (int i = 0; true; i++) {
+            Node n = item (i);
+            if (n == null)
+                return null;
+            if (n instanceof Element) {
+                return (Element)n;
+            }
+        }
+    }
 
     /**
      * Assigns the element factory to be used by this document.
@@ -846,7 +840,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
     public Element createElementNS(String namespaceURI, String qualifiedName)
         throws DOMException
     {
-        ElementNode retval = new ElementNode(namespaceURI, qualifiedName);
+        ElementNode2 retval = new ElementNode2(namespaceURI, qualifiedName);
         retval.setOwnerDocument(this);
         return retval;
     }
@@ -995,7 +989,10 @@ public class XmlDocument extends ParentNode implements DocumentEx
      * @param name the name of the attribute.
      */
     public Attr createAttribute(String name) throws DOMException {
-        AttributeNode retval = new AttributeNode(name, null, true, null);
+        if (!XmlNames.isName(name)) {
+            throw new DomEx(DOMException.INVALID_CHARACTER_ERR);
+        }
+        AttributeNode1 retval = new AttributeNode1(name, null, true, null);
         retval.setOwnerDocument(this);
         return retval;
     }
@@ -1171,7 +1168,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
 
             // Elements have associated attributes, which must
             // also have owners changed.
-            if (n instanceof ElementNode) {
+            if (n instanceof Element) {
                 NamedNodeMap    list = n.getAttributes ();
                 int             length = list.getLength ();
                 for (int i = 0; i < length; i++)
@@ -1285,7 +1282,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
 
             // Elements have associated attributes, which must
             // also have owners changed.
-            if (n instanceof ElementNode) {
+            if (n instanceof Element) {
                 NamedNodeMap    list = n.getAttributes ();
                 int             length = list.getLength ();
                 for (int i = 0; i < length; i++)

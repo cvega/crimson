@@ -487,7 +487,7 @@ public class ElementNode extends NamespacedNode implements ElementEx
 
         // Note: ownerElement of newAttr is both checked and set in the
         // following call to AttributeSet.setNamedItem(Node)
-	return (Attr)attributes.setNamedItem(newAttr);
+	return (Attr)attributes.setNamedItemNS(newAttr);
     }
 
     /** <b>DOM:</b> Remove the named attribute. */

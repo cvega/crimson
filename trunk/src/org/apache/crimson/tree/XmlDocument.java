@@ -994,7 +994,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
         if (!XmlNames.isName(name)) {
             throw new DomEx(DOMException.INVALID_CHARACTER_ERR);
         }
-        AttributeNode1 retval = new AttributeNode1(name, null, true, null);
+        AttributeNode1 retval = new AttributeNode1(name, "", true, null);
         retval.setOwnerDocument(this);
         return retval;
     }
@@ -1008,7 +1008,7 @@ public class XmlDocument extends ParentNode implements DocumentEx
     {
         AttributeNode.checkArguments(namespaceURI, qualifiedName);
         AttributeNode retval = new AttributeNode(namespaceURI, qualifiedName,
-                                                 null, true, null);
+                                                 "", true, null);
         retval.setOwnerDocument(this);
         return retval;
     }

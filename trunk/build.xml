@@ -94,6 +94,12 @@ All generated files are created under ${build.dir}
 
   <target name="javadoc">
     <mkdir dir="${build.dir}/docs/api"/>
+    <!-- XXX Temporarily disable building of javadoc because the issue of
+         what to do about the source for javax.xml.* classes still needs to
+         be worked out.  Otherwise there would be no javadoc for the javax
+         classes.  For now, use a statically generated version of the JAXP
+         1.1 javadoc.
+
     <javadoc packagenames="org.w3c.*,org.xml.*,javax.xml.*"
              sourcepath="src"
              destdir="${build.dir}/docs/api"
@@ -102,6 +108,8 @@ All generated files are created under ${build.dir}
              use="true"
              windowtitle="JAXP 1.1"
              doctitle="Java API for XML Parsing ${version}" />
+    -->
+    <unjar src="jaxp-javadoc.jar" dest="${build.dir}/docs"/>
   </target>
 
   <target name="other.doc">

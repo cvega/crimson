@@ -199,8 +199,7 @@ abstract class NodeBase
 
         
     // assigns the owner of this document
-    void setOwnerDocument (XmlDocument doc)
-    {
+    protected void setOwnerDocument(XmlDocument doc) {
 	ownerDocument = doc;
     }
 

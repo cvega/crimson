@@ -215,9 +215,7 @@ final class Doctype extends NodeBase implements DocumentType
         return internalSubset;
     }
 
-    // package private
-    void setOwnerDocument (XmlDocument doc)
-    {
+    protected void setOwnerDocument(XmlDocument doc) {
 	super.setOwnerDocument (doc);
 	if (entities != null)
 	    for (int i = 0; entities.item (i) != null; i++)

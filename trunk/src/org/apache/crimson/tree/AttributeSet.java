@@ -89,6 +89,10 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     private Vector      list;
     private Element     ownerElement;
         
+    private AttributeSet() {
+        // no-arg constructor
+    }
+
     /* Constructs an attribute list, with associated name scope. */
     // package private
     AttributeSet(Element ownerElement) {
@@ -121,13 +125,18 @@ class AttributeSet implements NamedNodeMap, XmlWritable
     }
 
     /**
-     * <b>DOM2:</b> Create DOM NamedNodeMap from SAX2 Attributes object
+     * Create a DOM NamedNodeMap consisting of DOM Level 2 Attr nodes from
+     * a SAX2 Attributes object
      */
-    AttributeSet(Attributes source) throws DOMException {
+    static AttributeSet createAttributeSet2(Attributes source)
+        throws DOMException
+    {
+        AttributeSet retval = new AttributeSet();
+
         int len = source.getLength();
         AttributesEx ex = null;
 
-        list = new Vector(len);
+        retval.list = new Vector(len);
         if (source instanceof AttributesEx) {
             ex = (AttributesEx) source;
         }
@@ -159,9 +168,41 @@ class AttributeSet implements NamedNodeMap, XmlWritable
                                   ex == null    // remember any default value
                                   ? null
                                   : ex.getDefault(i));
-            list.addElement(attrNode);
+            retval.list.addElement(attrNode);
         }
-        list.trimToSize();
+        return retval;
+    }
+
+    /**
+     * Create a DOM NamedNodeMap consisting of DOM Level 1 Attr nodes from
+     * a SAX2 Attributes object
+     */
+    static AttributeSet createAttributeSet1(Attributes source)
+        throws DOMException
+    {
+        AttributeSet retval = new AttributeSet();
+
+        int len = source.getLength();
+        AttributesEx ex = null;
+
+        retval.list = new Vector(len);
+        if (source instanceof AttributesEx) {
+            ex = (AttributesEx) source;
+        }
+
+	for (int i = 0; i < len; i++) {
+            AttributeNode1 attrNode1 = new AttributeNode1(
+                source.getQName(i),
+                source.getValue(i),
+                ex == null	// remember if it was specified
+                    ? true
+                    : ex.isSpecified(i),
+                ex == null	// remember any default value
+                    ? null
+                    : ex.getDefault(i));
+	    retval.list.addElement(attrNode1);
+	}
+        return retval;
     }
 
     // package private

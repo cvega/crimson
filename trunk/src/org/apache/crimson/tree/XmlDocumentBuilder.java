@@ -133,22 +133,27 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
     DeclHandler, DTDHandler
 {
     // used during parsing
-    private XmlDocument		document;
-    private Locator		locator;
+    protected XmlDocument		document;
+    protected Locator		locator;
     private Locale		locale = Locale.getDefault ();
 
     private ElementFactory	factory;
     private Vector		attrTmp = new Vector ();
     
-    private ParentNode		elementStack [];
-    private int         	topOfStack;
+    protected ParentNode        elementStack[];
+    protected int         	topOfStack;
     private boolean		inDTD;
     private boolean		inCDataSection;
 
     private Doctype		doctype;
 
     // parser modes
-    private boolean		disableNamespaces = true;
+    private boolean		disableNamespaces = true; /* Keep this for
+                                                             backward API
+                                                             compatibility,
+                                                             but it does
+                                                             not change any
+                                                             behavior. */
     private boolean             ignoreWhitespace = false;
     private boolean             expandEntityRefs = true;
     private boolean             ignoreComments = false;
@@ -450,7 +455,7 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
      * Receive notification of the beginning of an element.
      */
     public void startElement(String namespaceURI, String localName,
-                             String rawName, Attributes attributes)
+                             String qName, Attributes attributes)
 	throws SAXException
     {
 	//
@@ -460,7 +465,7 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 	int length = attributes.getLength();
 	if (length != 0) {
 	    try {
-		attSet = new AttributeSet(attributes);
+                attSet = AttributeSet.createAttributeSet1(attributes);
 	    } catch (DOMException ex) {
 		throw new SAXParseException(getMessage("XDB-002",
                         new Object[] { ex.getMessage() }), locator, ex);
@@ -471,22 +476,9 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 	// Then create the element, associate its attributes, and
 	// stack it for later addition.
 	//
-        ElementNode2 e = null;
+        ElementNode e = null;
 	try {
-            if ("".equals(namespaceURI)) {
-                // No namespaceURI
-                if (disableNamespaces) {
-                    // Enable element factory backward compatibility using
-                    // DOM Level 1 methods
-                    e = (ElementNode2)document.createElementEx(rawName);
-                } else {
-                    // Use DOM Level 2 method
-                    e = (ElementNode2)document.createElementNS(null, rawName);
-                }
-            } else {
-                e = (ElementNode2)document.createElementNS(namespaceURI,
-                                                           rawName);
-            }
+            e = (ElementNode) document.createElementEx(qName);
 	} catch (DOMException ex) {
 	    throw new SAXParseException(getMessage("XDB-004",
                     new Object[] { ex.getMessage() }), locator, ex);
@@ -501,22 +493,13 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
 
 	elementStack[topOfStack++].appendChild(e);
 	elementStack[topOfStack] = e;
-
-	//
-	// Division of responsibility for namespace processing is (being
-	// revised so) that the DOM builder reports errors when namespace
-	// constraints are violated, and the parser is ignorant of them.
-	//
-	if (!disableNamespaces) {
-            // XXX check duplicate attributes here ???
-	}
     }
 
     /**
      * Receive notification of the end of an element.
      */
     public void endElement(String namespaceURI, String localName,
-                           String rawName)
+                           String qName)
 	throws SAXException
     {
         ParentNode e = (ParentNode) elementStack[topOfStack];
@@ -611,10 +594,6 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
     public void processingInstruction(String name, String instruction) 
         throws SAXException
     {
-	if (!disableNamespaces && name.indexOf (':') != -1) {
-	    throw new SAXParseException((getMessage ("XDB-010")), locator);
-        }
-
 	// Ignore PIs in DTD for DOM support
 	if (inDTD)
 	    return;
@@ -788,10 +767,6 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
     public void internalEntityDecl(String name, String value)
 	throws SAXException
     {
-        if (!disableNamespaces && name.indexOf (':') != -1) {
-            throw new SAXParseException((getMessage("XDB-012")), locator);
-        }
-
         // SAX2 reports PEDecls which we ignore for DOM2.  SAX2 also reports
         // only the first defined GEDecl which matches with DOM2.
         if (!name.startsWith("%")) {
@@ -806,10 +781,6 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
                                    String systemId)
 	throws SAXException
     {
-        if (!disableNamespaces && name.indexOf (':') != -1) {
-            throw new SAXParseException((getMessage("XDB-012")), locator);
-        }
-
         // SAX2 reports PEDecls which we ignore for DOM2.  SAX2 also reports
         // only the first defined GEDecl which matches with DOM2.
         if (!name.startsWith("%")) {
@@ -828,10 +799,6 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
     public void notationDecl(String n, String p, String s)
 	throws SAXException
     {
-        if (!disableNamespaces && n.indexOf(':') != -1) {
-            throw new SAXParseException((getMessage("XDB-013")), locator);
-        }
-
         doctype.addNotation(n, p, s);
     }
 
@@ -842,10 +809,6 @@ public class XmlDocumentBuilder implements ContentHandler, LexicalHandler,
                                    String systemId, String notation)
 	throws SAXException
     {
-        if (!disableNamespaces && name.indexOf(':') != -1) {
-            throw new SAXParseException((getMessage("XDB-012")), locator);
-        }
-
         doctype.addEntityNode(name, publicId, systemId, notation);
     }
 }

@@ -71,6 +71,7 @@ import org.apache.crimson.parser.XMLReaderImpl;
 
 import org.apache.crimson.tree.XmlDocument;
 import org.apache.crimson.tree.XmlDocumentBuilder;
+import org.apache.crimson.tree.XmlDocumentBuilder2;
 import org.apache.crimson.tree.DOMImplementationImpl;
 
 import org.xml.sax.XMLReader;
@@ -101,6 +102,7 @@ public class DocumentBuilderImpl extends DocumentBuilder {
         throws ParserConfigurationException
     {
         this.dbf = dbf;
+        namespaceAware = dbf.isNamespaceAware();
 
         xmlReader = new XMLReaderImpl();
 
@@ -117,15 +119,26 @@ public class DocumentBuilderImpl extends DocumentBuilder {
                 setErrorHandler(new DefaultValidationErrorHandler());
             }
 
-            // Namespace related features needed for XmlDocumentBuilder
-            String namespaces = "http://xml.org/sax/features/namespaces";
-            xmlReader.setFeature(namespaces, true);
+            // SAX2 namespace-prefixes should be true for either builder
             String nsPrefixes =
                     "http://xml.org/sax/features/namespace-prefixes";
             xmlReader.setFeature(nsPrefixes, true);
 
-            // Create XmlDocumentBuilder instance
-            builder = new XmlDocumentBuilder();
+            if (namespaceAware) {
+                // Namespace requirements for DOM Level 2 XmlDocumentBuilder
+                String namespaces = "http://xml.org/sax/features/namespaces";
+                xmlReader.setFeature(namespaces, true);
+
+                // Create XmlDocumentBuilder instance
+                builder = new XmlDocumentBuilder2();
+            } else {
+                // Namespace requirements for DOM Level 1 XmlDocumentBuilder
+                String namespaces = "http://xml.org/sax/features/namespaces";
+                xmlReader.setFeature(namespaces, false);
+
+                // Create XmlDocumentBuilder instance
+                builder = new XmlDocumentBuilder();
+            }
 
             // Use builder as the ContentHandler
             xmlReader.setContentHandler(builder);
@@ -135,8 +148,8 @@ public class DocumentBuilderImpl extends DocumentBuilder {
             xmlReader.setProperty(lexHandler, builder);
 
             // org.xml.sax.ext.DeclHandler
-            String declHandler
-                = "http://xml.org/sax/properties/declaration-handler";
+            String declHandler =
+                    "http://xml.org/sax/properties/declaration-handler";
             xmlReader.setProperty(declHandler, builder);
 
             // DTDHandler
@@ -147,8 +160,6 @@ public class DocumentBuilderImpl extends DocumentBuilder {
         }
 
         // Set various builder properties obtained from DocumentBuilderFactory
-        namespaceAware = dbf.isNamespaceAware();
-        builder.setDisableNamespaces(!namespaceAware);  
         builder.setIgnoreWhitespace(dbf.isIgnoringElementContentWhitespace());
         builder.setExpandEntityReferences(dbf.isExpandEntityReferences());
         builder.setIgnoreComments(dbf.isIgnoringComments());

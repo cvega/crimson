@@ -165,9 +165,9 @@ public class ElementNode2 extends NamespacedNode implements ElementEx
         }
 
         // If we get here then we must have a valid prefix
-        if (namespaceURI == null || namespaceURI.equals("")
-                || (prefix.equals("xml") &&
-                    !XmlNames.SPEC_XML_URI.equals(namespaceURI))) {
+        if (namespaceURI == null
+            || (prefix.equals("xml") &&
+                !XmlNames.SPEC_XML_URI.equals(namespaceURI))) {
             throw new DomEx(DomEx.NAMESPACE_ERR);
         }
     }

@@ -72,6 +72,7 @@ import org.xml.sax.ext.*;
 
 import org.apache.crimson.util.MessageCatalog;
 import org.apache.crimson.util.XmlChars;
+import org.apache.crimson.util.XmlNames;
 
 
 //
@@ -1446,6 +1447,9 @@ public class Parser2
         // OK, finally report the event.
         if (namespaces) {
             String[] parts = processName(name.name, false);
+            System.out.println("name.name= " + name.name);
+            System.out.println("parts: " + parts[0] + " "
+                               + parts[1] + " " + parts[2]);
             contentHandler.startElement(parts[0], parts[1], parts[2], attTmp);
         } else {
             contentHandler.startElement("", "", name.name, attTmp);
@@ -1577,6 +1581,9 @@ public class Parser2
                                                isAttribute);
         if (parts == null) {
             parts = new String[3];
+            parts[0] = "";
+            String localName = XmlNames.getLocalPart(qName);
+            parts[1] = localName != null ? localName.intern() : "";
             parts[2] = qName.intern();
             error("P-084", new Object[] { qName });
         }

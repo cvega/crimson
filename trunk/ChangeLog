@@ -1,4 +1,4 @@
-2001-08-21  Edwin Goei  <edwingo@apache.org>
+2001-09-06  Edwin Goei  <edwingo@apache.org>
 
 	* Created new version 1.1.2beta2 of Crimson.  This version fixes
 	bugs in previous releases such as version 1.1.1 and 1.1.  It was
@@ -8,12 +8,13 @@
 	should be preferred over version 1.1.1 because it has additional
 	bug fixes.
 
-	* This version compiles JAXP src files including DOM L2 core and
-	SAX2 from the new xml-commons module which should be checked out
-	as a sibling of this tree.  The same jaxp.jar and crimson.jar
-	files containing the same packages are built.  Later, we may just
-	have a single crimson.jar that contains everything.
+	* This version obtains java src files including DOM Level 2 core
+	and SAX2 from the new xml-commons module which should be checked
+	out as a sibling of this tree to create a valid distribution.
 
+	* This version packages all classes, both implementation and JAXP
+	XML API classes into a single crimson.jar file.
+	
 2001-01-30  Edwin Goei  <edwingo@apache.org>
 
 	* Updated website, created zip file for download, misc clean up.

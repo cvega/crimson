@@ -108,7 +108,7 @@ downloads a source distribution and unpacks it, then case #2 should be used.
 
   <target name="copy-api-src-from-local" unless="xml-commons.present"
     depends="init">
-    <echo>Copying API src from local tree</echo>
+    <echo>*** Copying API src from local tree...</echo>
     <copy todir="${build.api.src}" includeemptydirs="no">
       <fileset dir="src">
         <patternset refid="api-patternset"/>
@@ -260,13 +260,13 @@ downloads a source distribution and unpacks it, then case #2 should be used.
       </fileset>
     </copy>
 
-    <zip zipfile="${build.dir}/crimson-bin-${impl.version}.zip"
+    <zip zipfile="${build.dir}/crimson-${impl.version}-bin.zip"
       basedir="${build.dir}" includes="${dist.file}/**"/>
 
-    <tar tarfile="${build.dir}/crimson-bin$-${impl.version}.tar"
+    <tar tarfile="${build.dir}/crimson-${impl.version}-bin.tar"
       basedir="${build.dir}" includes="${dist.file}/**"/>
-    <gzip zipfile="${build.dir}/crimson-bin-${impl.version}.tar.gz"
-      src="${build.dir}/crimson-bin-${impl.version}.tar"/>
+    <gzip zipfile="${build.dir}/crimson-${impl.version}-bin.tar.gz"
+      src="${build.dir}/crimson-${impl.version}-bin.tar"/>
   </target>
 
   <!-- =================================================================== -->
@@ -299,13 +299,13 @@ downloads a source distribution and unpacks it, then case #2 should be used.
       </fileset>
     </copy>
 
-    <zip zipfile="${build.dir}/crimson-src-${impl.version}.zip"
+    <zip zipfile="${build.dir}/crimson-${impl.version}-src.zip"
       basedir="${build.dir}" includes="${dist.file}/**"/>
 
-    <tar tarfile="${build.dir}/crimson-src$-${impl.version}.tar"
+    <tar tarfile="${build.dir}/crimson-${impl.version}-src.tar"
       basedir="${build.dir}" includes="${dist.file}/**"/>
-    <gzip zipfile="${build.dir}/crimson-src-${impl.version}.tar.gz"
-      src="${build.dir}/crimson-src-${impl.version}.tar"/>
+    <gzip zipfile="${build.dir}/crimson-${impl.version}-src.tar.gz"
+      src="${build.dir}/crimson-${impl.version}-src.tar"/>
   </target>
 
   <target name="dist" depends="pack-bin, pack-src">

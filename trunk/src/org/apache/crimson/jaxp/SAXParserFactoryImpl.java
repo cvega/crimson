@@ -127,7 +127,7 @@ public class SAXParserFactoryImpl extends SAXParserFactory {
      */
     public void setFeature(String name, boolean value)
         throws ParserConfigurationException, SAXNotRecognizedException, 
-		SAXNotSupportedException
+            SAXNotSupportedException
     {
         // XXX This is ugly.  We have to collect the features and then
         // later create an XMLReader to verify the features.
@@ -137,7 +137,15 @@ public class SAXParserFactoryImpl extends SAXParserFactory {
         features.put(name, new Boolean(value));
 
         // Test the feature by possibly throwing SAX exceptions
-        newSAXParserImpl();
+        try {
+            newSAXParserImpl();
+        } catch (SAXNotSupportedException e) {
+            features.remove(name);
+            throw e;
+        } catch (SAXNotRecognizedException e) {
+            features.remove(name);
+            throw e;
+        }
     }
 
     /**

@@ -143,6 +143,7 @@ public class TreeWalker
 	  case Node.DOCUMENT_FRAGMENT_NODE:
 	  case Node.DOCUMENT_NODE:
 	  case Node.ELEMENT_NODE:
+	  case Node.ENTITY_REFERENCE_NODE:
 	    //
 	    // For elements that can have children, visit those
 	    // children before any siblings (i.e. depth first)
@@ -161,7 +162,6 @@ public class TreeWalker
 	  case Node.CDATA_SECTION_NODE:
 	  case Node.COMMENT_NODE:
 	  case Node.DOCUMENT_TYPE_NODE:
-	  case Node.ENTITY_REFERENCE_NODE:
 	  case Node.ENTITY_NODE:
 	  case Node.PROCESSING_INSTRUCTION_NODE:
 	  case Node.TEXT_NODE:

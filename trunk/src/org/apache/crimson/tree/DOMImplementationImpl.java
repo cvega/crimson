@@ -95,7 +95,7 @@ public class DOMImplementationImpl implements DOMImplementation
 	if (!"XML".equalsIgnoreCase(feature)) {
 	    return false;
         }
-        if (version == null || "2.0".equals(version)
+        if (version == null || "".equals(version) || "2.0".equals(version)
             || "1.0".equals(version)) {
             return true;
         }
